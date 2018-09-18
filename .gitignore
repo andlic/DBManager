@@ -1,0 +1,11 @@
+# IDE Stuff
+.vscode/
+.settings
+.class
+.classpath
+.project
+pom.xml
+
+# Compiled stuff
+.class
+target/
