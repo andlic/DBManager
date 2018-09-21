@@ -268,9 +268,34 @@ public abstract class DBManager {
      * @param columns The columns we want to select.
      * @return An {@java.util.ArrayList} with each entry in our table. Also each {@link java.util.ArrayList}
      * has a {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and <i>Value of column</i> as {@code Value}.
-     * @throws SQLException
+     * @throws SQLException In case SQL syntax error or Connection error.
      */
     public abstract ArrayList<LinkedHashMap<String, String>> doSelect(String table, String condition, String... columns) throws SQLException;
+
+    /**
+     * It prints our select.
+     * 
+     * @param table The table we want to select from.
+     * @param condition The condition if its needed (otherwise just "").
+     * @param columns The columns we want to select.
+     * @throws SQLException In case SQL syntax error or Connection error.
+     */
+    public void showSelect(String table, String condition, String... columns)
+    throws SQLException {
+        ArrayList<LinkedHashMap<String, String>> resultSelect = doSelect(table, condition, columns);
+        // Getting literally any entry to get columns size
+        resultSelect.get(0).keySet().forEach(column -> {
+            System.out.print(column + " | ");
+        });
+        System.out.println();
+
+        resultSelect.forEach(select -> {
+            select.values().forEach(value -> {
+                System.out.print(value + " | ");
+            });
+            System.out.println();
+        });
+    }
 
     // GETTERS AND SETTERS
 

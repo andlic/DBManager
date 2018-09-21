@@ -115,10 +115,10 @@ public class DBMySQL extends DBManager {
         {
             while(result.next())
             {
+                // Creating a new Map for each element in columns
+                selectResult.add(new LinkedHashMap<>());
                 for(int i = 1; i <= resultData.getColumnCount(); ++i)
                 {
-                    // Creating a new Map for each element in columns
-                    selectResult.add(new LinkedHashMap<>());
                     // Adding values to that element
                     selectResult.get(selectResult.size() - 1).put(resultData.getColumnName(i), result.getString(i));
                 }
@@ -126,10 +126,10 @@ public class DBMySQL extends DBManager {
         } else {
             while (result.next())
             {
+                // Creating a new Map for each element in columns
+                selectResult.add(new LinkedHashMap<>());
                 for (int i = 0; i < columns.length; ++i)
                 {
-                    // Creating a new Map for each element in columns
-                    selectResult.add(new LinkedHashMap<>());
                     // Adding values to that element
                     selectResult.get(selectResult.size() - 1).put(columns[i], result.getString(i + 1));
                 }
