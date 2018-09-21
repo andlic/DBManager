@@ -1,11 +1,16 @@
 package net.lecuay.dbmanager;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Properties;
+import java.util.Scanner;
 
 /**
  * This abstract class declares a DB connection that will make easier
@@ -128,7 +133,7 @@ public abstract class DBManager {
      * @throws SQLException If database is null or access error is raised.
      * @throws ClassNotFoundException In case driver isn't found.
      */
-    protected abstract void doConnect() throws SQLException, ClassNotFoundException;
+    protected abstract void doConnect() throws SQLException;
 
     /**
      * Closes an open connection.
@@ -154,6 +159,118 @@ public abstract class DBManager {
         });
         connection.close();
     }
+
+    /**
+     * Executes either SQL code or a File SQL <i>(archive.sql)</i>
+     * and commits at the end.
+     * @param sql SQL code or path to the File SQL.
+     * @throws FileNotFoundException If file cannot be accessed.
+     * @throws SQLException If SQL syntax error or Connection error is raised.
+     */
+    public void doExecute(String sql)
+    throws FileNotFoundException, SQLException {
+        doExecute(sql, true);
+    }
+
+    /**
+     * Executes either SQL code or a File SQL <i>(archive.sql)</i>
+     * and commits if is needed.
+     * @param sql SQL code or path to the File SQL.
+     * @param commit {@code true} for committing, {@code false} otherwise.
+     * @throws FileNotFoundException If file cannot be accessed.
+     * @throws SQLException If SQL syntax error or Connection error is raised.
+     */
+    public void doExecute(String sql, boolean commit)
+    throws FileNotFoundException, SQLException {
+        File file = new File(sql);
+        // Check if SQL exists and is a file
+        if (file.exists() && file.isFile())
+        {
+            executeFile(file, true);
+        } else {
+            executeQuery(new String[]{sql}, true);
+        }
+    }
+
+    /**
+     * Executes a SQL file query-by-query.
+     * @param fileSQL The SQL file to execute.
+     * @param commit {@code true} for committing, {@code false} otherwise.
+     * @throws FileNotFoundException In case file cannot be found.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    protected void executeFile(File fileSQL, boolean commit)
+    throws FileNotFoundException, SQLException {
+        String sql = "";
+        Scanner reader = new Scanner(fileSQL);
+
+        while(reader.hasNext())
+        {
+            sql += reader.next() + " ";
+        }
+        reader.close();
+
+        // Getting each query by ';' character
+        String[] queries = sql.split(";");
+        executeQuery(queries, commit);
+    }
+
+    /**
+     * Executes SQL code and commits if needed.
+     * @param codeSQL Array of SQL code to execute.
+     * @param commit {@code true} for committing, {@code false} otherwise.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    protected void executeQuery(String[] codeSQL, boolean commit)
+    throws SQLException {
+        doConnect();
+        Statement stm = connection.createStatement();
+
+        for(String query: codeSQL)
+        {
+            // Looking for empty Strings
+            if (!(query.isEmpty() || query.trim().isEmpty() || query == null))
+            {
+                // Adding delimiter
+                if (query.indexOf(";") == -1)
+                {
+                    query += ";";
+                }
+                stm.executeUpdate(query);
+            } else {
+                throw new SQLException("Query was empty.");
+            }
+        }
+
+        if (commit && !connection.getAutoCommit())
+            connection.commit();
+        
+        doClose(stm);
+    }
+
+    /**
+     * This method will return an <code>{@literal ArrayList<Map<Column, Value of Column>>}</code>
+     * for example:<br>
+     * 
+     * <b>Assuming that we have 3 entries in our table <i>sample</i> with the following
+     * columns: <i>id</i>, <i>name</i>, <i>country</i> we must use:</b>
+     * 
+     * <pre>
+     * // Create object conex
+     * {@literal ArrayList<LinkedHashMap<String, String>>} select;
+     * select = conex.doSelect("sample", "", "id", "name", "country");
+     * </pre>
+     * Our <i>select</i> object now is filled with 3 {@link java.util.Map}, each map has
+     * <i>id</i>, <i>name</i>, <i>country</i> as {@code Keys} and its respective values.
+     * 
+     * @param table The table we want to select from.
+     * @param condition The condition if its needed (otherwise just "").
+     * @param columns The columns we want to select.
+     * @return An {@java.util.ArrayList} with each entry in our table. Also each {@link java.util.ArrayList}
+     * has a {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and <i>Value of column</i> as {@code Value}.
+     * @throws SQLException
+     */
+    public abstract ArrayList<LinkedHashMap<String, String>> doSelect(String table, String condition, String... columns) throws SQLException;
 
     // GETTERS AND SETTERS
 

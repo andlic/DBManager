@@ -2,7 +2,12 @@ package net.lecuay.dbmanager;
 
 import java.net.URI;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * Class created as instance of {@link DBManager} created to manage MySQL
@@ -77,9 +82,62 @@ public class DBMySQL extends DBManager {
     }
 
     @Override
-    protected void doConnect() throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    protected void doConnect() throws SQLException {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch(ClassNotFoundException e) {
+            System.out.println("Driver not found! -> " + e.getMessage());
+        }
 		connection = DriverManager.getConnection(JDBC, properties);
+    }
+
+    @Override
+    public ArrayList<LinkedHashMap<String, String>> doSelect(String table, String condition, String... columns)
+    throws SQLException {
+        doConnect();
+
+        ArrayList<LinkedHashMap<String, String>> selectResult = new ArrayList<>();
+        StringBuilder codeSQL = new StringBuilder("SELECT ");
+        
+        codeSQL.append(String.join(", ", columns));
+        codeSQL.append(" FROM ").append(table);
+        
+        if (!(condition.isEmpty() || condition.trim().isEmpty())) {
+            codeSQL.append(" WHERE ").append(condition);
+        }
+    
+        Statement stm = connection.createStatement();
+        ResultSet result = stm.executeQuery(codeSQL.toString());
+        ResultSetMetaData resultData = result.getMetaData();
+        
+        // Checking if user wants every data from a table
+        if(columns[0].equals("*"))
+        {
+            while(result.next())
+            {
+                for(int i = 1; i <= resultData.getColumnCount(); ++i)
+                {
+                    // Creating a new Map for each element in columns
+                    selectResult.add(new LinkedHashMap<>());
+                    // Adding values to that element
+                    selectResult.get(selectResult.size() - 1).put(resultData.getColumnName(i), result.getString(i));
+                }
+            }
+        } else {
+            while (result.next())
+            {
+                for (int i = 0; i < columns.length; ++i)
+                {
+                    // Creating a new Map for each element in columns
+                    selectResult.add(new LinkedHashMap<>());
+                    // Adding values to that element
+                    selectResult.get(selectResult.size() - 1).put(columns[i], result.getString(i + 1));
+                }
+            }
+        }
+        
+        doClose(stm, result);
+        return selectResult;
     }
     
 }
