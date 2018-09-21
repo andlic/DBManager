@@ -4,8 +4,11 @@
 .class
 .classpath
 .project
-pom.xml
+*pom.xml
 
 # Compiled stuff
-.class
+*.class
 target/
+
+# Test
+test/

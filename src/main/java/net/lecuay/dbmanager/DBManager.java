@@ -1,8 +1,11 @@
 package net.lecuay.dbmanager;
 
-import java.io.File;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * This abstract class declares a DB connection that will make easier
@@ -34,11 +37,18 @@ public abstract class DBManager {
     /** Declares if SSLMODE is required. */
     protected boolean sslmode;
 
+    /** The <b>JDBC</b> used for the connection. */
+    protected String JDBC;
+
     /** The object {@link Connection} used for queries. */
     protected Connection connection;
 
+    /** List of <b>Propeties</b> required for the connection. */
+    protected final Properties properties = new Properties();
+
     /**
      * Simple Enum used for setting allowed connections.<br>
+     * <h3>Supported Connections:</h3>
      * <ul>
      * <li>MYSQL - MySQL connection.</li>
      * <li>POSTGRESQL - PostgreSQL connection.</li>
@@ -72,55 +82,77 @@ public abstract class DBManager {
         this.conexType = conexType;
         this.port = port;
         this.sslmode = sslmode;
+
+        properties.setProperty("user", user);
+        properties.setProperty("password", password);
+    }
+
+    /**
+     * Creates a connection based on a given <b>JDBC</b>.
+     * @param user The user used for the connection.
+     * @param password The password used for the connection.
+     * @param JDBC The customized JDBC given.
+     */
+    protected DBManager(String user, String password, String JDBC)
+    {
+        this.user = user;
+        this.password = password;
+        this.JDBC = JDBC;
+
+        properties.setProperty("user", user);
+        properties.setProperty("password", password);
+    }
+
+    /**
+     * Creates a connection based on a given URI.
+     * @param uri The object {@link java.net.URI} used for the connection. 
+     */
+    protected DBManager(URI uri)
+    {
+        // Since UserInfo works by user:password we are getting each
+        user = uri.getUserInfo().split(":")[0];
+        password = uri.getUserInfo().split(":")[1];
+        host = uri.getHost();
+        port = uri.getPort();
+
+        // getSchemeSpecificPart will return a full path, but we only need Database, which is
+        // followed by host:port/
+        DBName = uri.getSchemeSpecificPart().split(port + "/")[1];
+
+        properties.setProperty("user", user);
+        properties.setProperty("password", password);
     }
 
     /**
      * This method will make a connection for our Database.
      * @throws SQLException If database is null or access error is raised.
+     * @throws ClassNotFoundException In case driver isn't found.
      */
-    protected abstract void doConnect() throws SQLException;
+    protected abstract void doConnect() throws SQLException, ClassNotFoundException;
 
     /**
      * Closes an open connection.
      * @throws SQLException If access error is raised.
      */
-    protected void doClose() throws SQLException
+    protected void doClose() throws SQLException{connection.close();}
+
+    /**
+     * Closes connection itself and every object in params.
+     * @param oCloseables Objects that implements {@link java.lang.AutoCloseable}.
+     * @throws SQLException In case {@link java.sql.Connection} couldn't be closed.
+     */
+    protected void doClose(Object... oCloseables) throws SQLException
     {
+        ArrayList<Object> arrayCloseables = new ArrayList<>(Arrays.asList(oCloseables));
+        arrayCloseables.forEach(closeable -> {
+            if(!(closeable instanceof java.lang.AutoCloseable))
+                try {
+                    throw new Exception("The object " + closeable.toString() + " cannot be closed!");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+        });
         connection.close();
-    }
-
-    /**
-     * Executes a file SQL or SQL code.
-     * @param sql Path to the SQL file or SQL code itself.
-     */
-    public void doExecute(String sql)
-    {
-        File sqlFile = new File(sql);
-        
-        if (sqlFile.exists())
-        {
-            executeFile(sqlFile);
-        } else {
-            executeSQL(sql);
-        }
-    }
-
-    /**
-     * 
-     * @param sql
-     */
-    protected void executeFile(File sql)
-    {
-
-    }
-
-    /**
-     * 
-     * @param sql
-     */
-    protected void executeSQL(String sql)
-    {
-        
     }
 
     // GETTERS AND SETTERS
@@ -163,13 +195,13 @@ public abstract class DBManager {
     
     /**
      * Returns the user used for the connection.
-     * @return User as {@link String}.
+     * @return User as {@link java.lang.String}.
      */
     public String getUser(){return this.user;}
 
     /**
      * Returns the name of the Database we are connected to.
-     * @return Database's name as {@link String}.
+     * @return Database's name as {@link java.lang.String}.
      */
     public String getDBName(){return this.DBName;}
 
@@ -181,7 +213,7 @@ public abstract class DBManager {
 
     /**
      * Returns the name of the enum {@link DBType} used in the actual connection.
-     * @return {@link DBType} as {@link String}.
+     * @return {@link DBType} as {@link java.lang.String}.
      */
     public String getConexTypeName(){return this.conexType.name();}
 
