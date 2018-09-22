@@ -164,7 +164,7 @@ public class DBMySQL extends DBManager {
         }
 
         // Creating sentence
-        String sql = "INSERT INTO `" + table + "`(`";
+        String sql = "INSERT INTO `" + table + "`(`";  // Getting case-sensitive by '`'
         sql += String.join("`, `", parsedInserts.keySet().toArray(new String[]{})) + "`)";
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
         sql += ";";

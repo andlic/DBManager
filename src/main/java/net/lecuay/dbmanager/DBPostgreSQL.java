@@ -11,17 +11,17 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
- * Class created as instance of {@link DBManager} to manage SQL Server
+ * Class created as instance of {@link DBManager} to manage PostgreSQL
  * connections.
  * 
  * @author LeCuay
  * @version 0.1 - Alpha
  * @see DBManager
  */
-public class DBSQLServer extends DBManager {
+public class DBPostgreSQL extends DBManager {
 
     /**
-     * Declares parameters used for a connection.
+     * Creates a connection with the parameters given.
      * @param user The user used for the connection.
      * @param password The password used for the connecion.
      * @param host The host where our Database is hosted.
@@ -29,11 +29,9 @@ public class DBSQLServer extends DBManager {
      * @param port The port used for the connection.
      * @param sslmode Declares if SSL is required.
      */
-    public DBSQLServer(String user, String password, String host, String DBName, int port, boolean sslmode)
+    public DBPostgreSQL(String user, String password, String host, String DBName, int port, boolean sslmode)
     {
-        super(user, password, host, DBName, DBType.SQLSERVER, port, sslmode);
-
-        properties.setProperty("databaseName", this.DBName);
+        super(user, password, host, DBName, DBType.MYSQL, port, sslmode);
     }
 
     /**
@@ -42,7 +40,7 @@ public class DBSQLServer extends DBManager {
      * @param password The password used for the connection.
      * @param JDBC The customized JDBC given.
      */
-    public DBSQLServer(String user, String password, String JDBC)
+    public DBPostgreSQL(String user, String password, String JDBC)
     {
         super(user, password, JDBC);
     }
@@ -51,7 +49,7 @@ public class DBSQLServer extends DBManager {
      * Creates a connection based on a given URI.
      * @param uri The object {@link java.net.URI} used for the connection. 
      */
-    public DBSQLServer(URI uri)
+    public DBPostgreSQL(URI uri)
     {
         super(uri);
     }
@@ -61,41 +59,41 @@ public class DBSQLServer extends DBManager {
      * <ul>
      * <li>Scheme = null</li>
      * <li>host = localhost</li>
-     * <li>port = 1433</li>
+     * <li>port = 5432</li>
      * <li>ssl = non-required</li>
      * </ul>
      * It also creates the JDBC with the given parameters.<br>
      * This methods requires {@code setDBName(String DBName)} for later
      * connection to a Database.<br>
      * <pre>
-     * DBSQLServer conex = DBSQLServer("username", "password");
+     * DBPostgreSQL conex = DBPostgreSQL("username", "password");
      * conex.setDBName("sampleDatabase");
      * </pre>
      * @param user The user used for the connection.
      * @param password The password used for the connection.
      */
-    public DBSQLServer(String user, String password)
+    public DBPostgreSQL(String user, String password)
     {
-        super(user, password, "localhost", "", DBType.SQLSERVER, 1433, false);
+        super(user, password, "localhost", "", DBType.MYSQL, 5432, false);
     }
 
     @Override
     protected void doConnect() throws SQLException {
         try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Class.forName("org.postgresql.Driver");
         } catch(ClassNotFoundException e) {
             System.out.println("Driver not found! -> " + e.getMessage());
         }
 
         if (JDBC.equals(""))
         {
-            JDBC = "jdbc:sqlserver://"  + host + ":" + port + "/" + ";";
+            JDBC = "jdbc:postgres://" + host + ":" + port + "/" + DBName;
             // If SSL is required JDBC will be updated.
             if(sslmode)
-                JDBC += "integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
+                JDBC += "?ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory";
         }
         
-		connection = DriverManager.getConnection(JDBC, properties);
+        connection = DriverManager.getConnection(JDBC, properties);
     }
 
     @Override
@@ -151,7 +149,7 @@ public class DBSQLServer extends DBManager {
 	@Override
     public void doInsert(String table, String... inserts)
     throws SQLException {
-		doConnect();
+        doConnect();
         Statement stm = connection.createStatement();
         HashMap<String, String> parsedInserts = new HashMap<>();
 
@@ -167,8 +165,8 @@ public class DBSQLServer extends DBManager {
         }
 
         // Creating sentence
-        String sql = "INSERT INTO " + table + "(";
-        sql += String.join(", ", parsedInserts.keySet().toArray(new String[]{})) + ")";
+        String sql = "INSERT INTO " + '"' + table + '"' + "(";  // Also we need to get case-sensitive so we use '"'
+        sql += String.join(", " + '"', parsedInserts.keySet().toArray(new String[]{})) + '"' + ")";
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
         sql += ";";
 
@@ -176,5 +174,6 @@ public class DBSQLServer extends DBManager {
 
         doClose(stm);
 	}
+
     
 }
