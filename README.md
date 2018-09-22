@@ -17,6 +17,9 @@ DBManager has compatibility with the following drivers' version:
 - **SQL Server**:
   - Driver: `com.microsoft.sqlserver.jdbc.SQLServerDriver`
   - Version: `Microsoft JDBC Driver for SQL Server 7.1.0`. Tested with `7.1.0.jre10-preview` for Maven repositories.
+- **PostgreSQL**:
+  - Driver: `org.postgres.Driver`.
+  - Version: `PostgreSQL JDBC Driver JDBC 4.2`. Tested with `42.2.5` for Maven repositories.
 
 ## Features
 
