@@ -40,10 +40,10 @@ public abstract class DBManager {
     protected int port;
 
     /** Declares if SSLMODE is required. */
-    protected boolean sslmode;
+    protected boolean sslmode = false;
 
     /** The <b>JDBC</b> used for the connection. */
-    protected String JDBC;
+    protected String JDBC = ""; 
 
     /** The object {@link Connection} used for queries. */
     protected Connection connection;
@@ -145,17 +145,26 @@ public abstract class DBManager {
      * Closes connection itself and every object in params.
      * @param oCloseables Objects that implements {@link java.lang.AutoCloseable}.
      * @throws SQLException In case {@link java.sql.Connection} couldn't be closed.
+     * @throws Exception If object cannot be closed.
      */
-    protected void doClose(Object... oCloseables) throws SQLException
-    {
-        ArrayList<Object> arrayCloseables = new ArrayList<>(Arrays.asList(oCloseables));
+    protected void doClose(AutoCloseable... oCloseables)
+    throws SQLException {
+        ArrayList<AutoCloseable> arrayCloseables = new ArrayList<>(Arrays.asList(oCloseables));
         arrayCloseables.forEach(closeable -> {
             if(!(closeable instanceof java.lang.AutoCloseable))
+            {
                 try {
                     throw new Exception("The object " + closeable.toString() + " cannot be closed!");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            } else {
+                try {
+                    closeable.close();
+                } catch (Exception e) {
+                    System.err.println("The object " + closeable.toString() + " cannot be closed!");
+                }
+            }
         });
         connection.close();
     }
@@ -188,7 +197,7 @@ public abstract class DBManager {
         {
             executeFile(file, true);
         } else {
-            executeQuery(new String[]{sql}, true);
+            executeQuery(true, sql);
         }
     }
 
@@ -212,16 +221,16 @@ public abstract class DBManager {
 
         // Getting each query by ';' character
         String[] queries = sql.split(";");
-        executeQuery(queries, commit);
+        executeQuery(commit, queries);
     }
 
     /**
      * Executes SQL code and commits if needed.
-     * @param codeSQL Array of SQL code to execute.
      * @param commit {@code true} for committing, {@code false} otherwise.
+     * @param codeSQL Array of SQL code to execute.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
-    protected void executeQuery(String[] codeSQL, boolean commit)
+    protected void executeQuery(boolean commit, String... codeSQL)
     throws SQLException {
         doConnect();
         Statement stm = connection.createStatement();
@@ -297,25 +306,56 @@ public abstract class DBManager {
         });
     }
 
+    /**
+     * Do a insert into a table.<br>
+     * Parameters must follow the next syntax {@code columnName=value}.<br>
+     * For example, assuming that we want to insert <i>name</i>, <i>coins</i> and <i>id</i> into
+     * <i>sample</i> table we have to use the following lines:
+     * <pre>
+     * // DBManager instace conex
+     * conex.doInsert("sample", "name='LeCuay'", "coins=12.5", "id=12")
+     * </pre>
+     * <b>Is very important to follow the correct syntax: values between <i>''</i> for Strings
+     * and plain for numbers.
+     * 
+     * @param table The table where values will be inserted.
+     * @param inserts The values to insert following the syntax: {@code column=value}.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    public abstract void doInsert(String table, String... inserts) throws SQLException;
+
     // GETTERS AND SETTERS
+
+    /*
+    ** ---- Every time we reset something by setValue() method JDBC must be reseted ---- **
+    */
 
     /**
      * Changes the user used in the Database connection.
      * @param user The new user.
      */
-    public void setUser(String user){this.user = user;}
+    public void setUser(String user){
+        JDBC = "";
+        this.user = user;
+    }
 
     /**
      * Changes the password used for the connection.
      * @param password The new password.
      */
-    public void setPassword(String password){this.password = password;}
+    public void setPassword(String password){
+        JDBC = "";
+        this.password = password;
+    }
 
     /**
      * Changes the Database we want connect to.
      * @param DBName The new Database.
      */
-    public void setDBName(String DBName){this.DBName = DBName;}
+    public void setDBName(String DBName){
+        JDBC = "";
+        this.DBName = DBName;
+    }
 
     /**
      * Changes the enum {@link DBType} used for the connection.
@@ -327,13 +367,19 @@ public abstract class DBManager {
      * Changes the port used for the connection.
      * @param port The new port.
      */
-    public void setPort(int port){this.port = port;}
+    public void setPort(int port){
+        JDBC = "";
+        this.port = port;
+    }
 
     /**
      * Sets if SSL is required.
      * @param sslmode {@code True} if is required {@code False} otherwise.
      */
-    public void setSSLMode(boolean sslmode){this.sslmode = sslmode;}
+    public void setSSLMode(boolean sslmode){
+        JDBC = "";
+        this.sslmode = sslmode;
+    }
     
     /**
      * Returns the user used for the connection.

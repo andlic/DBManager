@@ -7,10 +7,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
- * Class created as instance of {@link DBManager} created to manage MySQL
+ * Class created as instance of {@link DBManager} to manage MySQL
  * connections.
  * 
  * @author LeCuay
@@ -30,11 +31,6 @@ public class DBMySQL extends DBManager {
     public DBMySQL(String user, String password, String host, String DBName, int port, boolean sslmode)
     {
         super(user, password, host, DBName, DBType.MYSQL, port, sslmode);
-        JDBC = "jdbc:mysql://" + host + "/" + this.DBName;
-
-        // If SSL is required JDBC will be updated.
-        if(sslmode)
-            JDBC += "?verifyServerCertificate=true&useSSL=true&requireSSL=true";
     }
 
     /**
@@ -78,7 +74,6 @@ public class DBMySQL extends DBManager {
     public DBMySQL(String user, String password)
     {
         super(user, password, "localhost", "", DBType.MYSQL, 3306, false);
-        JDBC = "jdbc:mysql://" + host + "/";
     }
 
     @Override
@@ -88,6 +83,15 @@ public class DBMySQL extends DBManager {
         } catch(ClassNotFoundException e) {
             System.out.println("Driver not found! -> " + e.getMessage());
         }
+        
+        if (JDBC.equals(""))
+        {
+            JDBC = "jdbc:mysql://" + host + ":" + port + "/" + DBName;
+            // If SSL is required JDBC will be updated.
+            if(sslmode)
+                JDBC += "?verifyServerCertificate=true&useSSL=true&requireSSL=true";
+        }
+        
 		connection = DriverManager.getConnection(JDBC, properties);
     }
 
@@ -105,7 +109,8 @@ public class DBMySQL extends DBManager {
         if (!(condition.isEmpty() || condition.trim().isEmpty())) {
             codeSQL.append(" WHERE ").append(condition);
         }
-    
+        codeSQL.append(";");
+
         Statement stm = connection.createStatement();
         ResultSet result = stm.executeQuery(codeSQL.toString());
         ResultSetMetaData resultData = result.getMetaData();
@@ -138,6 +143,35 @@ public class DBMySQL extends DBManager {
         
         doClose(stm, result);
         return selectResult;
+    }
+
+    @Override
+    public void doInsert(String table, String... inserts)
+    throws SQLException {
+        doConnect();
+        Statement stm = connection.createStatement();
+        HashMap<String, String> parsedInserts = new HashMap<>();
+
+        for (String insert: inserts)
+        {
+            // Checks if insert syntax is correct
+            if(insert.indexOf("=") == -1)
+            {
+                throw new SQLException("Syntax error: Inserts have to follow the next syntax 'columnName=value'");
+            }
+            // Inserts follows column=value so we have to store each
+            parsedInserts.put(insert.split("=")[0].trim(), insert.split("=")[1].trim());
+        }
+
+        // Creating sentence
+        String sql = "INSERT INTO `" + table + "`(`";
+        sql += String.join("`, `", parsedInserts.keySet().toArray(new String[]{})) + "`)";
+        sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
+        sql += ";";
+
+        executeQuery(true, sql);
+
+        doClose(stm);
     }
     
 }
