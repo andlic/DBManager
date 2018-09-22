@@ -87,7 +87,7 @@ public class DBPostgreSQL extends DBManager {
 
         if (JDBC.equals(""))
         {
-            JDBC = "jdbc:postgres://" + host + ":" + port + "/" + DBName;
+            JDBC = "jdbc:postgresql://" + host + ":" + port + "/" + DBName;
             // If SSL is required JDBC will be updated.
             if(sslmode)
                 JDBC += "?ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory";
