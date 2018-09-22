@@ -30,12 +30,15 @@ Some functions are:
 
 - `doExecute(String sql)`: Allows you to execute either a `file.sql` or SQL code itself.
 - `doSelect(String table, String condition, String... columns)`: It makes a select based on parameters and return the result as an `ArrayList`.
-- `doInsert(String table, String inserts)`: Inserts values into a table by the following syntax -> `doInsert("table", "column=value", "column2=value2", ...)`.
+- `doInsert(String table, String... inserts)`: Inserts values into a table by the following syntax -> `doInsert("table", "column=value", "column2=value2", ...)`.
+- `doUpdate(String table, String condition, String... updates)`: The syntax is the same as `doInsert`, but in this case is updating columns from rows.
 
 ## To-Do List
 
 - [ ] Add more functions.
-- [ ] Add compatibility with PostgreSQL.
+- [x] Add compatibility with MySQL.
+- [x] Add compatibility with SQL Server.
+- [x] Add compatibility with PostgreSQL.
 - [ ] Add compatibility with SQLite3.
 - [ ] Create User Interface.
 - [ ] Test complex files SQL.
