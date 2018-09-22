@@ -148,8 +148,6 @@ public class DBMySQL extends DBManager {
     @Override
     public void doInsert(String table, String... inserts)
     throws SQLException {
-        doConnect();
-        Statement stm = connection.createStatement();
         HashMap<String, String> parsedInserts = new HashMap<>();
 
         for (String insert: inserts)
@@ -164,18 +162,16 @@ public class DBMySQL extends DBManager {
         }
 
         // Creating sentence
-        String sql = "INSERT INTO `" + table + "`(`";  // Getting case-sensitive by '`'
-        sql += String.join("`, `", parsedInserts.keySet().toArray(new String[]{})) + "`)";
+        String sql = "INSERT INTO `" + table + "`(";  // Getting case-sensitive by '`'
+        sql += String.join(", ", "`" + parsedInserts.keySet().toArray(new String[]{}) + "`") + ")";
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
         sql += ";";
 
         executeQuery(true, sql);
-
-        doClose(stm);
     }
 
     @Override
-    public void doUpdate(String table, String condition, String updates) throws SQLException {
+    public void doUpdate(String table, String condition, String... updates) throws SQLException {
 
     }
     

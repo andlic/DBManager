@@ -341,7 +341,7 @@ public abstract class DBManager {
      * @param updates The values to update following the syntax: {@code column=newValue}.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
-    public abstract void doUpdate(String table, String condition, String updates) throws SQLException;
+    public abstract void doUpdate(String table, String condition, String... updates) throws SQLException;
 
     // GETTERS AND SETTERS
 

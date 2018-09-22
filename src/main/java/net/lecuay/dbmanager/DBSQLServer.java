@@ -80,7 +80,8 @@ public class DBSQLServer extends DBManager {
     }
 
     @Override
-    protected void doConnect() throws SQLException {
+    protected void doConnect()
+    throws SQLException {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         } catch(ClassNotFoundException e) {
@@ -151,8 +152,6 @@ public class DBSQLServer extends DBManager {
 	@Override
     public void doInsert(String table, String... inserts)
     throws SQLException {
-		doConnect();
-        Statement stm = connection.createStatement();
         HashMap<String, String> parsedInserts = new HashMap<>();
 
         for (String insert: inserts)
@@ -173,12 +172,10 @@ public class DBSQLServer extends DBManager {
         sql += ";";
 
         executeQuery(true, sql);
-
-        doClose(stm);
 	}
 
     @Override
-    public void doUpdate(String table, String condition, String updates) throws SQLException {
+    public void doUpdate(String table, String condition, String... updates) throws SQLException {
 
     }
     

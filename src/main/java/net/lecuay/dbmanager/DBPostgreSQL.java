@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.Map.Entry;
 
 /**
  * Class created as instance of {@link DBManager} to manage PostgreSQL
@@ -78,7 +80,8 @@ public class DBPostgreSQL extends DBManager {
     }
 
     @Override
-    protected void doConnect() throws SQLException {
+    protected void doConnect()
+    throws SQLException {
         try {
             Class.forName("org.postgresql.Driver");
         } catch(ClassNotFoundException e) {
@@ -149,8 +152,6 @@ public class DBPostgreSQL extends DBManager {
 	@Override
     public void doInsert(String table, String... inserts)
     throws SQLException {
-        doConnect();
-        Statement stm = connection.createStatement();
         HashMap<String, String> parsedInserts = new HashMap<>();
 
         for (String insert: inserts)
@@ -165,19 +166,48 @@ public class DBPostgreSQL extends DBManager {
         }
 
         // Creating sentence
-        String sql = "INSERT INTO " + '"' + table + '"' + "(";  // Also we need to get case-sensitive so we use '"'
-        sql += String.join(", " + '"', parsedInserts.keySet().toArray(new String[]{})) + '"' + ")";
+        String sql = "INSERT INTO \"" + table + "\"(";  // Also we need to get case-sensitive so we use '"'
+        sql += String.join(", ", "\"" + parsedInserts.keySet().toArray(new String[]{}) + "\"") + ")";
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
         sql += ";";
 
         executeQuery(true, sql);
-
-        doClose(stm);
 	}
 
     @Override
-    public void doUpdate(String table, String condition, String updates) throws SQLException {
+    public void doUpdate(String table, String condition, String... updates)
+    throws SQLException {
+        // Our HashMap will store column and value
+        HashMap<String, String> parsedUpdates = new HashMap<>();
 
+        for(String update: updates)
+        {
+            // Checks if insert syntax is correct
+            if(update.indexOf("=") == -1)
+            {
+                throw new SQLException("Syntax error: Inserts have to follow the next syntax 'columnName=value'");
+            }
+            // Inserts follows column=value so we have to store each
+            parsedUpdates.put(update.split("=")[0].trim(), update.split("=")[1].trim());
+        }
+
+        // Creating sentence
+        String sql = "UPDATE \"" + table + "\" SET ";
+        // Since with lamda we need to scope a finally, we just create another variable
+        Set<Entry<String, String>> entrySet = parsedUpdates.entrySet();
+
+        for(Entry<String, String> entry: entrySet)
+        {
+            sql += String.join(", ", "\"" + entry.getKey() + "\" = " + entry.getValue());
+        }
+
+        if (!condition.equals(""))
+        {
+            sql += " WHERE " + condition;
+        }
+        sql += ";";
+        
+        executeQuery(true, sql);
     }
 
     
