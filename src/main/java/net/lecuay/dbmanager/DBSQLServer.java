@@ -176,5 +176,10 @@ public class DBSQLServer extends DBManager {
 
         doClose(stm);
 	}
+
+    @Override
+    public void doUpdate(String table, String condition, String updates) throws SQLException {
+
+    }
     
 }

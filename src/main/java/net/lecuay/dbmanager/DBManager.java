@@ -307,7 +307,7 @@ public abstract class DBManager {
     }
 
     /**
-     * Do a insert into a table.<br>
+     * Does a insert into a table.<br>
      * Parameters must follow the next syntax {@code columnName=value}.<br>
      * For example, assuming that we want to insert <i>name</i>, <i>coins</i> and <i>id</i> into
      * <i>sample</i> table we have to use the following lines:
@@ -316,13 +316,32 @@ public abstract class DBManager {
      * conex.doInsert("sample", "name='LeCuay'", "coins=12.5", "id=12")
      * </pre>
      * <b>Is very important to follow the correct syntax: values between <i>''</i> for Strings
-     * and plain for numbers.
+     * and plain for numbers.</b>
      * 
      * @param table The table where values will be inserted.
      * @param inserts The values to insert following the syntax: {@code column=value}.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
     public abstract void doInsert(String table, String... inserts) throws SQLException;
+
+    /**
+     * Does an update into row or rows.<br>
+     * Parameters must follow the next syntax {@code columnName=newValue}.<br>
+     * For example, assuming we want to change every <i>name</i> value starting by
+     * "Jr." for "Mr." we will use the following code:
+     * <pre>
+     * // DBManager instance conex
+     * conex.doUpdate("sample", "name LIKE 'Jr.%'", "name='Mr. ' + name");
+     * </pre>
+     * <b>Is very important to follow the correct syntax: values between <i>''</i> for Strings
+     * and plain for numbers.</b>
+     * 
+     * @param tableThe Table where values will be updated.
+     * @param condition The condition for updating rows.
+     * @param updates The values to update following the syntax: {@code column=newValue}.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    public abstract void doUpdate(String table, String condition, String updates) throws SQLException;
 
     // GETTERS AND SETTERS
 
