@@ -25,7 +25,7 @@ public class DBTypeSelection extends JPanel {
             cell_btn = new JButton(t.toString());
             cell_btn.addActionListener((ActionEvent e) -> {
                 MainThread.getWindow().setDbtype(t);
-                MainThread.getWindow().setPanel(new ConectionForm());
+                MainThread.getWindow().setPanel(new ConnectionForm());
                 // Cambiar de panel al formulario
             });
             buttons.add(cell_btn);

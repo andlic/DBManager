@@ -7,9 +7,9 @@ import net.lecuay.dbmanager.DBManager;
  *
  * @author javier
  */
-public class ConectionForm extends javax.swing.JPanel {
+public class ConnectionForm extends javax.swing.JPanel {
 
-    public ConectionForm() {
+    public ConnectionForm() {
         initComponents();
     }
 
