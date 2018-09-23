@@ -1,7 +1,6 @@
 # IDE Stuff
 .vscode/
 .settings
-.class
 .classpath
 .project
 *pom.xml
