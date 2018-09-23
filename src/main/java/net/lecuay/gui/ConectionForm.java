@@ -225,8 +225,12 @@ public class ConectionForm extends javax.swing.JPanel {
         if (!user_tf.getText().isEmpty() && !password_pf.getText().isEmpty() && !host_tf.getText().isEmpty() && !DBName_tf.getText().isEmpty() && !port_tf.getText().isEmpty()) {
             System.out.println(user_tf.getText() + " " + password_pf.getText() + " " + host_tf.getText() + " " + DBName_tf.getText() + " " + port_tf.getText() + " ");
             try {
-                MainThread.getWindow().setPanel(new Connecting(user_tf.getText(), password_pf.getText(), host_tf.getText(), DBName_tf.getText(), Integer.parseInt(port_tf.getText()), sslmode_cb.isSelected()));
-            } catch (java.lang.RuntimeException e) {
+                try {
+                    MainThread.getWindow().setPanel(new Connecting(user_tf.getText(), password_pf.getText(), host_tf.getText(), DBName_tf.getText(), Integer.parseInt(port_tf.getText()), sslmode_cb.isSelected()));
+                } catch (UnsupportedOperationException e1){
+                    JOptionPane.showMessageDialog(null, "Error. Not supported action");
+                }
+            } catch (java.lang.RuntimeException e2) {
                 JOptionPane.showMessageDialog(null, "Error. Please confirm that the fields are filled correctly");
             }
         }
