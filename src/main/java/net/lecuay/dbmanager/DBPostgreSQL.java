@@ -13,13 +13,14 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 /**
- * Class created as instance of {@link DBManager} to manage MySQL
+ * Class created as instance of {@link DBManager} to manage PostgreSQL
  * connections.
  * 
  * @author LeCuay
  * @version 0.1 - Alpha
+ * @see DBManager
  */
-public class DBMySQL extends DBManager {
+public class DBPostgreSQL extends DBManager {
 
     /**
      * Creates a connection with the parameters given.
@@ -30,7 +31,7 @@ public class DBMySQL extends DBManager {
      * @param port The port used for the connection.
      * @param sslmode Declares if SSL is required.
      */
-    public DBMySQL(String user, String password, String host, String DBName, int port, boolean sslmode)
+    public DBPostgreSQL(String user, String password, String host, String DBName, int port, boolean sslmode)
     {
         super(user, password, host, DBName, DBType.MYSQL, port, sslmode);
     }
@@ -41,7 +42,7 @@ public class DBMySQL extends DBManager {
      * @param password The password used for the connection.
      * @param JDBC The customized JDBC given.
      */
-    public DBMySQL(String user, String password, String JDBC)
+    public DBPostgreSQL(String user, String password, String JDBC)
     {
         super(user, password, JDBC);
     }
@@ -50,7 +51,7 @@ public class DBMySQL extends DBManager {
      * Creates a connection based on a given URI.
      * @param uri The object {@link java.net.URI} used for the connection. 
      */
-    public DBMySQL(URI uri)
+    public DBPostgreSQL(URI uri)
     {
         super(uri);
     }
@@ -60,41 +61,42 @@ public class DBMySQL extends DBManager {
      * <ul>
      * <li>Scheme = null</li>
      * <li>host = localhost</li>
-     * <li>port = 3306</li>
+     * <li>port = 5432</li>
      * <li>ssl = non-required</li>
      * </ul>
      * It also creates the JDBC with the given parameters.<br>
      * This methods requires {@code setDBName(String DBName)} for later
      * connection to a Database.<br>
      * <pre>
-     * DBMySQL conex = DBMySQL("username", "password");
+     * DBPostgreSQL conex = DBPostgreSQL("username", "password");
      * conex.setDBName("sampleDatabase");
      * </pre>
      * @param user The user used for the connection.
      * @param password The password used for the connection.
      */
-    public DBMySQL(String user, String password)
+    public DBPostgreSQL(String user, String password)
     {
-        super(user, password, "localhost", "", DBType.MYSQL, 3306, false);
+        super(user, password, "localhost", "", DBType.MYSQL, 5432, false);
     }
 
     @Override
-    protected void doConnect() throws SQLException {
+    protected void doConnect()
+    throws SQLException {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("org.postgresql.Driver");
         } catch(ClassNotFoundException e) {
             System.out.println("Driver not found! -> " + e.getMessage());
         }
-        
+
         if (JDBC.equals(""))
         {
-            JDBC = "jdbc:mysql://" + host + ":" + port + "/" + DBName;
+            JDBC = "jdbc:postgresql://" + host + ":" + port + "/" + DBName;
             // If SSL is required JDBC will be updated.
             if(sslmode)
-                JDBC += "?verifyServerCertificate=true&useSSL=true&requireSSL=true";
+                JDBC += "?ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory";
         }
         
-		connection = DriverManager.getConnection(JDBC, properties);
+        connection = DriverManager.getConnection(JDBC, properties);
     }
 
     @Override
@@ -147,7 +149,7 @@ public class DBMySQL extends DBManager {
         return selectResult;
     }
 
-    @Override
+	@Override
     public void doInsert(String table, String... inserts)
     throws SQLException {
         HashMap<String, String> parsedInserts = new HashMap<>();
@@ -164,13 +166,13 @@ public class DBMySQL extends DBManager {
         }
 
         // Creating sentence
-        String sql = "INSERT INTO `" + table + "`(";  // Getting case-sensitive by '`'
-        sql += String.join(", ", "`" + parsedInserts.keySet().toArray(new String[]{}) + "`") + ")";
+        String sql = "INSERT INTO \"" + table + "\"(";  // Also we need to get case-sensitive so we use '"'
+        sql += String.join(", ", "\"" + parsedInserts.keySet().toArray(new String[]{}) + "\"") + ")";
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
         sql += ";";
 
         executeQuery(true, sql);
-    }
+	}
 
     @Override
     public void doUpdate(String table, String condition, String... updates)
@@ -190,13 +192,13 @@ public class DBMySQL extends DBManager {
         }
 
         // Creating sentence
-        String sql = "UPDATE `" + table + "` SET ";
+        String sql = "UPDATE \"" + table + "\" SET ";
         // Since with lamda we need to scope a finally, we just create another variable
         Set<Entry<String, String>> entrySet = parsedUpdates.entrySet();
 
         for(Entry<String, String> entry: entrySet)
         {
-            sql += String.join(", ", "`" + entry.getKey() + "` = " + entry.getValue());
+            sql += String.join(", ", "\"" + entry.getKey() + "\" = " + entry.getValue());
         }
 
         if (!condition.equals(""))
@@ -207,5 +209,6 @@ public class DBMySQL extends DBManager {
         
         executeQuery(true, sql);
     }
+
     
 }
