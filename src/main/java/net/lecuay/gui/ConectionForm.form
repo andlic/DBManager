@@ -17,65 +17,58 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace pref="25" max="32767" attributes="0"/>
+              <EmptySpace pref="8" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="btn_atras" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="222" max="-2" attributes="0"/>
-                      <Component id="btn_siguiente" min="-2" max="-2" attributes="0"/>
+                      <Component id="back_btn" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="next_btn" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="lb_usuario" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="lb_uri" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="77" max="-2" attributes="0"/>
-                          <Component id="tf_uri" min="-2" pref="270" max="-2" attributes="0"/>
+                  <Component id="user_lb" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="uri_lb" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="77" max="-2" attributes="0"/>
+                      <Component id="uri_tf" min="-2" pref="270" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="157" max="-2" attributes="0"/>
+                      <Component id="dbtype_lb" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="password_lb" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="host_lb" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="DBName_lb" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="157" max="-2" attributes="0"/>
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="lb_contraseña" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="lb_host" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="lb_base_datos" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Component id="tf_usuario" min="-2" pref="129" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
-                                  <Component id="lb_sslmode" min="-2" max="-2" attributes="0"/>
+                                  <Component id="user_tf" min="-2" pref="129" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="80" max="-2" attributes="0"/>
+                                  <Component id="sslmode_lb" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="cb_sslmode" min="-2" max="-2" attributes="0"/>
+                                  <Component id="sslmode_cb" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="tf_base_datos" min="-2" pref="270" max="-2" attributes="0"/>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                              <Component id="tf_host" pref="129" max="32767" attributes="0"/>
-                                              <Component id="tf_contraseña" alignment="1" max="32767" attributes="0"/>
-                                          </Group>
-                                          <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
-                                          <Component id="lb_puerto" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="tf_puerto" min="-2" pref="64" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <Component id="host_tf" min="-2" pref="129" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
+                                  <Component id="port_lb" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="port_tf" min="-2" pref="64" max="-2" attributes="0"/>
                               </Group>
                           </Group>
+                          <Component id="DBName_tf" min="-2" pref="270" max="-2" attributes="0"/>
+                          <Component id="password_pf" alignment="0" min="-2" pref="129" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="lb_jdbc" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="65" max="-2" attributes="0"/>
-                          <Component id="tf_jdbc" min="-2" pref="270" max="-2" attributes="0"/>
-                      </Group>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="jdbc_lb" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="65" max="-2" attributes="0"/>
+                      <Component id="jdbc_tf" min="-2" pref="270" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace pref="25" max="32767" attributes="0"/>
+              <EmptySpace pref="8" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -83,47 +76,47 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <Component id="dbtype_lb" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="lb_usuario" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="tf_usuario" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="lb_sslmode" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="user_lb" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="user_tf" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="sslmode_lb" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="cb_sslmode" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="sslmode_cb" alignment="0" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="password_lb" min="-2" max="-2" attributes="0"/>
+                  <Component id="password_pf" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lb_contraseña" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tf_contraseña" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="host_lb" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="host_tf" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="port_lb" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="port_tf" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lb_host" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tf_host" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lb_puerto" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tf_puerto" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="DBName_lb" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="DBName_tf" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lb_base_datos" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tf_base_datos" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jdbc_lb" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jdbc_tf" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lb_jdbc" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tf_jdbc" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="uri_lb" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="uri_tf" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lb_uri" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tf_uri" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="btn_atras" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btn_siguiente" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="back_btn" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="next_btn" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -131,113 +124,120 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="dbtype_lb">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="Ventana.getDBType().toString()" type="code"/>
+          <Connection code="net.lecuay.gui.MainThread.getWindow().getDBType().toString()" type="code"/>
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lb_usuario">
+    <Component class="javax.swing.JLabel" name="user_lb">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Usuario:"/>
+        <Property name="text" type="java.lang.String" value="User:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lb_contrase&#xf1;a">
+    <Component class="javax.swing.JLabel" name="password_lb">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Contrase&#xf1;a:"/>
+        <Property name="text" type="java.lang.String" value="Password:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lb_host">
+    <Component class="javax.swing.JLabel" name="host_lb">
       <Properties>
         <Property name="text" type="java.lang.String" value="Host:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lb_base_datos">
+    <Component class="javax.swing.JLabel" name="DBName_lb">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Base de datos:"/>
+        <Property name="text" type="java.lang.String" value="Database name:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lb_puerto">
+    <Component class="javax.swing.JLabel" name="port_lb">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Puerto:"/>
+        <Property name="text" type="java.lang.String" value="Port:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lb_sslmode">
+    <Component class="javax.swing.JLabel" name="sslmode_lb">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Modo SSL"/>
+        <Property name="text" type="java.lang.String" value="SSL Mode"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="tf_usuario">
+    <Component class="javax.swing.JTextField" name="user_tf">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Usuario"/>
+        <Property name="toolTipText" type="java.lang.String" value="User"/>
+        <Property name="name" type="java.lang.String" value="" noResource="true"/>
       </Properties>
+      <AccessibilityProperties>
+        <Property name="AccessibleContext.accessibleName" type="java.lang.String" value=""/>
+      </AccessibilityProperties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tf_usuarioActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="user_tfActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JCheckBox" name="cb_sslmode">
+    <Component class="javax.swing.JCheckBox" name="sslmode_cb">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cb_sslmodeActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sslmode_cbActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="tf_contrase&#xf1;a">
+    <Component class="javax.swing.JTextField" name="host_tf">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Contrase&#xf1;a"/>
+        <Property name="toolTipText" type="java.lang.String" value="example: 192.123.123.123"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="DBName_tf">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="Database name"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tf_contrase&#xf1;aActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="DBName_tfActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="tf_host">
+    <Component class="javax.swing.JTextField" name="port_tf">
       <Properties>
-        <Property name="text" type="java.lang.String" value="ej: 192.123.123.123"/>
+        <Property name="toolTipText" type="java.lang.String" value="example: 8080"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="tf_base_datos">
+    <Component class="javax.swing.JLabel" name="jdbc_lb">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Base de datos"/>
+        <Property name="text" type="java.lang.String" value="JDBC:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="jdbc_tf">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="JDBC"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="uri_lb">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="URI:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="uri_tf">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="URI"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tf_base_datosActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="uri_tfActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="tf_puerto">
+    <Component class="javax.swing.JButton" name="back_btn">
       <Properties>
-        <Property name="text" type="java.lang.String" value="ej: 8080"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lb_jdbc">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="JDBC"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="tf_jdbc">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="JDBC"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lb_uri">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="URI"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="tf_uri">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="URI"/>
+        <Property name="text" type="java.lang.String" value="Back"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tf_uriActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="back_btnActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="btn_atras">
+    <Component class="javax.swing.JButton" name="next_btn">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Atr&#xe1;s"/>
+        <Property name="text" type="java.lang.String" value="Next"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="next_btnActionPerformed"/>
+      </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="btn_siguiente">
+    <Component class="javax.swing.JPasswordField" name="password_pf">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Siguiente"/>
+        <Property name="toolTipText" type="java.lang.String" value="Password"/>
       </Properties>
     </Component>
   </SubComponents>
