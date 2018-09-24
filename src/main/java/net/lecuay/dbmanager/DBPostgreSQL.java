@@ -166,8 +166,8 @@ public class DBPostgreSQL extends DBManager {
         }
 
         // Creating sentence
-        String sql = "INSERT INTO \"" + table + "\"(";  // Also we need to get case-sensitive so we use '"'
-        sql += String.join(", ", "\"" + parsedInserts.keySet().toArray(new String[]{}) + "\"") + ")";
+        String sql = "INSERT INTO \"" + table + "\"(\"";  // Also we need to get case-sensitive so we use '"'
+        sql += String.join("\", \"", parsedInserts.keySet().toArray(new String[]{})) + "\")";
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
         sql += ";";
 
