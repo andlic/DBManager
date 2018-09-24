@@ -32,6 +32,9 @@ Some functions are:
 - `doSelect(String table, String condition, String... columns)`: It makes a select based on parameters and return the result as an `ArrayList`.
 - `doInsert(String table, String... inserts)`: Inserts values into a table by the following syntax -> `doInsert("table", "column=value", "column2=value2", ...)`.
 - `doUpdate(String table, String condition, String... updates)`: The syntax is the same as `doInsert`, but in this case is updating columns from rows.
+- `doDelete(String table, String condition)`: Deletes a row or rows where *condition* is true.
+- `createTable(String table, String columns)`: Creates a table with the given columns (id INTEGER PRIMARY KEY, ...).
+- `createDatabase(String database)`: Creates a Database.
 
 ## To-Do List
 
