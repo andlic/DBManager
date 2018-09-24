@@ -339,20 +339,28 @@ public abstract class DBManager {
     public abstract void doUpdate(String table, String condition, String... updates) throws SQLException;
 
     /**
+     * Deletes a row or rows where condition is true.
+     * @param table The table we want to remove the rows.
+     * @param condition The condition for the rows to be deleted.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    public abstract void doDelete(String table, String condition) throws SQLException;
+
+    /**
      * Creates a table with the columns given in paramaters.<br>
-     * Parameters must follow the next syntax {@code columnName=type value}.<br>
+     * Parameters must follow the next syntax {@code columnName Type Value}.<br>
      * For exaple, assuming we want to create the table 'persons' with <i>id (integer primary key)</i>,
      * <i>name (varchar(255))</i> and <i>age (integer(4))</i> we will use the follow code:
      * <pre>
      * // DBManager instance conex
-     * conex.createTable("persons", "id=INTEGER PRIMARY KEY",
-     *                              "name=VARCHAR(255)",
-     *                              "age=INTEGER(4)");
+     * conex.createTable("persons", "id INTEGER PRIMARY KEY",
+     *                              "name VARCHAR(255)",
+     *                              "age INTEGER(4)");
      * </pre>
      * <b>Keep in mind each SQL Connection has its own syntax.</b>
      * 
      * @param table Name of the table we want to create.
-     * @param columns The columns to create following the syntax: {@code colunmName=type value}.
+     * @param columns The columns to create following the syntax: {@code colunmName Type Value}.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
     public abstract void createTable(String table, String... columns) throws SQLException;

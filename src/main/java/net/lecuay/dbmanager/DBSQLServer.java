@@ -211,5 +211,25 @@ public class DBSQLServer extends DBManager {
         
         executeQuery(true, sql);
     }
+
+    @Override
+    public void doDelete(String table, String condition) throws SQLException {
+        String sql = "DELETE FROM " + table + " WHERE " + condition + ";";
+        executeQuery(true, sql);
+    }
+
+    @Override
+    public void createTable(String table, String... columns) throws SQLException {
+        String sql = "CREATE TABLE " + table + " (";
+        sql += String.join(", ", columns) + ")";
+        sql += ";";
+        executeQuery(true, sql);
+    }
+
+    @Override
+    public void createDatabase(String database) throws SQLException {
+        String sql = "CREATE DATABASE " + database + ";";
+        executeQuery(true, sql);
+    }
     
 }
