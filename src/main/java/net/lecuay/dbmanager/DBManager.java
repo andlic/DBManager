@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Properties;
 import java.util.Scanner;
@@ -149,23 +148,19 @@ public abstract class DBManager {
      */
     protected void doClose(AutoCloseable... oCloseables)
     throws SQLException {
-        ArrayList<AutoCloseable> arrayCloseables = new ArrayList<>(Arrays.asList(oCloseables));
-        arrayCloseables.forEach(closeable -> {
+        for (AutoCloseable closeable: oCloseables)
+        {
             if(!(closeable instanceof java.lang.AutoCloseable))
             {
-                try {
-                    throw new Exception("The object " + closeable.toString() + " cannot be closed!");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                throw new SQLException("The object " + closeable + " cannot be closed!");
             } else {
                 try {
                     closeable.close();
                 } catch (Exception e) {
-                    System.err.println("The object " + closeable.toString() + " cannot be closed!");
+                    throw new SQLException("The object " + closeable + " cannot be closed!");
                 }
             }
-        });
+        }
         connection.close();
     }
 
@@ -361,6 +356,13 @@ public abstract class DBManager {
      * @throws SQLException If SQL syntax error or connection error raises.
      */
     public abstract void createTable(String table, String... columns) throws SQLException;
+
+    /**
+     * Creates a database with the given name.
+     * @param database The name of the database to create.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    public abstract void createDatabase(String database) throws SQLException;
 
     // GETTERS AND SETTERS
 
