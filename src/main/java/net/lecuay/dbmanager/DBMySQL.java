@@ -164,11 +164,11 @@ public class DBMySQL extends DBManager {
         }
 
         // Creating sentence
-        String sql = "INSERT INTO `" + table + "`(";  // Getting case-sensitive by '`'
-        sql += String.join(", ", "`" + parsedInserts.keySet().toArray(new String[]{}) + "`") + ")";
+        String sql = "INSERT INTO `" + table + "`(`";  // Getting case-sensitive by '`'
+        sql += String.join("`, `", parsedInserts.keySet().toArray(new String[parsedInserts.keySet().size()])) + "`)";  
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
         sql += ";";
-
+        
         executeQuery(true, sql);
     }
 
