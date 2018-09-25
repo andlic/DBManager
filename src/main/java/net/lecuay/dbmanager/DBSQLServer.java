@@ -115,7 +115,6 @@ public class DBSQLServer extends DBManager {
         if (!(condition.isEmpty() || condition.trim().isEmpty())) {
             codeSQL.append(" WHERE ").append(condition);
         }
-        codeSQL.append(";");
 
         Statement stm = connection.createStatement();
         ResultSet result = stm.executeQuery(codeSQL.toString());
@@ -171,7 +170,6 @@ public class DBSQLServer extends DBManager {
         String sql = "INSERT INTO " + table + "(";
         sql += String.join(", ", parsedInserts.keySet().toArray(new String[]{})) + ")";
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
-        sql += ";";
 
         executeQuery(true, sql);
 	}
@@ -207,14 +205,13 @@ public class DBSQLServer extends DBManager {
         {
             sql += " WHERE " + condition;
         }
-        sql += ";";
         
         executeQuery(true, sql);
     }
 
     @Override
     public void doDelete(String table, String condition) throws SQLException {
-        String sql = "DELETE FROM " + table + " WHERE " + condition + ";";
+        String sql = "DELETE FROM " + table + " WHERE " + condition;
         executeQuery(true, sql);
     }
 
@@ -222,13 +219,24 @@ public class DBSQLServer extends DBManager {
     public void createTable(String table, String... columns) throws SQLException {
         String sql = "CREATE TABLE " + table + " (";
         sql += String.join(", ", columns) + ")";
-        sql += ";";
         executeQuery(true, sql);
     }
 
     @Override
     public void createDatabase(String database) throws SQLException {
-        String sql = "CREATE DATABASE " + database + ";";
+        String sql = "CREATE DATABASE " + database;
+        executeQuery(true, sql);
+    }
+
+    @Override
+    public void dropTable(String... tables) throws SQLException {
+        String sql = "DROP TABLE IF EXISTS " + String.join(", ", tables);
+        executeQuery(true, sql);
+    }
+
+    @Override
+    public void dropDatabase(String... databases) throws SQLException {
+        String sql = "DROP DATABASE IF EXISTS " + String.join(", ", databases);
         executeQuery(true, sql);
     }
     

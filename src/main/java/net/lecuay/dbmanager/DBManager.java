@@ -331,7 +331,7 @@ public abstract class DBManager {
      * <b>Is very important to follow the correct syntax: values between <i>''</i> for Strings
      * and plain for numbers.</b>
      * 
-     * @param tableThe Table where values will be updated.
+     * @param table The Table where values will be updated.
      * @param condition The condition for updating rows.
      * @param updates The values to update following the syntax: {@code column=newValue}.
      * @throws SQLException If SQL syntax error or connection error raises.
@@ -371,6 +371,20 @@ public abstract class DBManager {
      * @throws SQLException If SQL syntax error or connection error raises.
      */
     public abstract void createDatabase(String database) throws SQLException;
+
+    /**
+     * Deletes a table or tables.
+     * @param tables The tables to delete.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    public abstract void dropTable(String... tables) throws SQLException;
+
+    /**
+     * Deletes a database or databases.
+     * @param databases The databases to delete.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    public abstract void dropDatabase(String... databases) throws SQLException;
 
     // GETTERS AND SETTERS
 
