@@ -67,6 +67,8 @@ public abstract class DBManager {
         SQLITE3
     }
 
+    // <editor-fold defaultstate="collapsed" desc="Constructors">
+
     /**
      * Declares parameters used for a connection.
      * @param user The user used for the connection.
@@ -126,6 +128,8 @@ public abstract class DBManager {
         properties.setProperty("user", user);
         properties.setProperty("password", password);
     }
+
+    // </editor-fold>
 
     /**
      * This method will make a connection for our Database.
@@ -233,10 +237,10 @@ public abstract class DBManager {
         for(String query: codeSQL)
         {
             // Looking for empty Strings
-            if (!(query.isEmpty() || query.trim().isEmpty() || query == null))
+            if (!(query.isEmpty() || query.trim().isEmpty()))
             {
                 // Adding delimiter
-                if (query.indexOf(";") == -1)
+                if (!query.contains(";"))
                 {
                     query += ";";
                 }
@@ -270,7 +274,7 @@ public abstract class DBManager {
      * @param table The table we want to select from.
      * @param condition The condition if its needed (otherwise just "").
      * @param columns The columns we want to select.
-     * @return An {@java.util.ArrayList} with each entry in our table. Also each {@link java.util.ArrayList}
+     * @return An {@link java.util.ArrayList} with each entry in our table. Also each {@link java.util.ArrayList}
      * has a {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and <i>Value of column</i> as {@code Value}.
      * @throws SQLException In case SQL syntax error or Connection error.
      */
@@ -288,15 +292,11 @@ public abstract class DBManager {
     throws SQLException {
         ArrayList<LinkedHashMap<String, String>> resultSelect = doSelect(table, condition, columns);
         // Getting literally any entry to get columns size
-        resultSelect.get(0).keySet().forEach(column -> {
-            System.out.print(column + " | ");
-        });
+        resultSelect.get(0).keySet().forEach(column -> System.out.print(column + " | "));
         System.out.println();
 
         resultSelect.forEach(select -> {
-            select.values().forEach(value -> {
-                System.out.print(value + " | ");
-            });
+            select.values().forEach(value -> System.out.print(value + " | "));
             System.out.println();
         });
     }
@@ -386,8 +386,7 @@ public abstract class DBManager {
      */
     public abstract void dropDatabase(String... databases) throws SQLException;
 
-    // GETTERS AND SETTERS
-
+    // <editor-fold defaultstate="collapsed" desc="Setter and Getters">
     /*
     ** ---- Every time we reset something by setValue() method JDBC must be reseted ---- **
     */
@@ -478,5 +477,7 @@ public abstract class DBManager {
      * @return {@code True} or {@code False}.
      */
     public boolean isSSLMode(){return this.sslmode;}
+    
+    // </editor-fold>
     
 }
