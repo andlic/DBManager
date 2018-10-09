@@ -134,7 +134,6 @@ public abstract class DBManager {
     /**
      * This method will make a connection for our Database.
      * @throws SQLException If database is null or access error is raised.
-     * @throws ClassNotFoundException In case driver isn't found.
      */
     protected abstract void doConnect() throws SQLException;
 
@@ -148,7 +147,6 @@ public abstract class DBManager {
      * Closes connection itself and every object in params.
      * @param oCloseables Objects that implements {@link java.lang.AutoCloseable}.
      * @throws SQLException In case {@link java.sql.Connection} couldn't be closed.
-     * @throws Exception If object cannot be closed.
      */
     protected void doClose(AutoCloseable... oCloseables)
     throws SQLException {
