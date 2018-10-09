@@ -67,6 +67,8 @@ public abstract class DBManager {
         SQLITE3
     }
 
+    // <editor-fold defaultstate="collapsed" desc="Constructors">
+
     /**
      * Declares parameters used for a connection.
      * @param user The user used for the connection.
@@ -127,10 +129,11 @@ public abstract class DBManager {
         properties.setProperty("password", password);
     }
 
+    // </editor-fold>
+
     /**
      * This method will make a connection for our Database.
      * @throws SQLException If database is null or access error is raised.
-     * @throws ClassNotFoundException In case driver isn't found.
      */
     protected abstract void doConnect() throws SQLException;
 
@@ -144,7 +147,6 @@ public abstract class DBManager {
      * Closes connection itself and every object in params.
      * @param oCloseables Objects that implements {@link java.lang.AutoCloseable}.
      * @throws SQLException In case {@link java.sql.Connection} couldn't be closed.
-     * @throws Exception If object cannot be closed.
      */
     protected void doClose(AutoCloseable... oCloseables)
     throws SQLException {
@@ -233,10 +235,10 @@ public abstract class DBManager {
         for(String query: codeSQL)
         {
             // Looking for empty Strings
-            if (!(query.isEmpty() || query.trim().isEmpty() || query == null))
+            if (!(query.isEmpty() || query.trim().isEmpty()))
             {
                 // Adding delimiter
-                if (query.indexOf(";") == -1)
+                if (!query.contains(";"))
                 {
                     query += ";";
                 }
@@ -270,7 +272,7 @@ public abstract class DBManager {
      * @param table The table we want to select from.
      * @param condition The condition if its needed (otherwise just "").
      * @param columns The columns we want to select.
-     * @return An {@java.util.ArrayList} with each entry in our table. Also each {@link java.util.ArrayList}
+     * @return An {@link java.util.ArrayList} with each entry in our table. Also each {@link java.util.ArrayList}
      * has a {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and <i>Value of column</i> as {@code Value}.
      * @throws SQLException In case SQL syntax error or Connection error.
      */
@@ -288,15 +290,11 @@ public abstract class DBManager {
     throws SQLException {
         ArrayList<LinkedHashMap<String, String>> resultSelect = doSelect(table, condition, columns);
         // Getting literally any entry to get columns size
-        resultSelect.get(0).keySet().forEach(column -> {
-            System.out.print(column + " | ");
-        });
+        resultSelect.get(0).keySet().forEach(column -> System.out.print(column + " | "));
         System.out.println();
 
         resultSelect.forEach(select -> {
-            select.values().forEach(value -> {
-                System.out.print(value + " | ");
-            });
+            select.values().forEach(value -> System.out.print(value + " | "));
             System.out.println();
         });
     }
@@ -331,7 +329,7 @@ public abstract class DBManager {
      * <b>Is very important to follow the correct syntax: values between <i>''</i> for Strings
      * and plain for numbers.</b>
      * 
-     * @param tableThe Table where values will be updated.
+     * @param table The Table where values will be updated.
      * @param condition The condition for updating rows.
      * @param updates The values to update following the syntax: {@code column=newValue}.
      * @throws SQLException If SQL syntax error or connection error raises.
@@ -372,8 +370,21 @@ public abstract class DBManager {
      */
     public abstract void createDatabase(String database) throws SQLException;
 
-    // GETTERS AND SETTERS
+    /**
+     * Deletes a table or tables.
+     * @param tables The tables to delete.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    public abstract void dropTable(String... tables) throws SQLException;
 
+    /**
+     * Deletes a database or databases.
+     * @param databases The databases to delete.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    public abstract void dropDatabase(String... databases) throws SQLException;
+
+    // <editor-fold defaultstate="collapsed" desc="Setter and Getters">
     /*
     ** ---- Every time we reset something by setValue() method JDBC must be reseted ---- **
     */
@@ -464,5 +475,7 @@ public abstract class DBManager {
      * @return {@code True} or {@code False}.
      */
     public boolean isSSLMode(){return this.sslmode;}
+    
+    // </editor-fold>
     
 }

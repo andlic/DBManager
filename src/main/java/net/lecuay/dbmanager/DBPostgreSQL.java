@@ -113,7 +113,6 @@ public class DBPostgreSQL extends DBManager {
         if (!(condition.isEmpty() || condition.trim().isEmpty())) {
             codeSQL.append(" WHERE ").append(condition);
         }
-        codeSQL.append(";");
 
         Statement stm = connection.createStatement();
         ResultSet result = stm.executeQuery(codeSQL.toString());
@@ -169,7 +168,6 @@ public class DBPostgreSQL extends DBManager {
         String sql = "INSERT INTO \"" + table + "\"(\"";  // Also we need to get case-sensitive so we use '"'
         sql += String.join("\", \"", parsedInserts.keySet().toArray(new String[]{})) + "\")";
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
-        sql += ";";
 
         executeQuery(true, sql);
 	}
@@ -205,7 +203,6 @@ public class DBPostgreSQL extends DBManager {
         {
             sql += " WHERE " + condition;
         }
-        sql += ";";
         
         executeQuery(true, sql);
     }
@@ -218,16 +215,31 @@ public class DBPostgreSQL extends DBManager {
 
     @Override
     public void createTable(String table, String... columns) throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS \"" + table + "\" (";
+        String sql = "CREATE TABLE \"" + table + "\" (";
         sql += String.join(", ", columns) + ")";
-        sql += ";";
         executeQuery(true, sql);
     }
 
     @Override
     public void createDatabase(String database) throws SQLException {
-        String sql = "CREATE DATABASE \"" + database + "\";";
+        String sql = "CREATE DATABASE \"" + database + "\"";
         executeQuery(true, sql);
+    }
+
+    @Override
+    public void dropTable(String... tables) throws SQLException {
+        String sql = "DROP TABLE IF EXISTS \"" + String.join("\", \"", tables) + "\"";
+        executeQuery(true, sql);
+    }
+
+    @Override
+    public void dropDatabase(String... databases) throws SQLException {
+        String sql;
+        for(String db: databases)
+        {
+            sql = "DROP DATABASE IF EXISTS \"" + db + "\"";
+            executeQuery(true, sql);
+        }
     }
 
     
