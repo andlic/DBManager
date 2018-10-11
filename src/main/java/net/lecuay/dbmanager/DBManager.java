@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -438,6 +439,90 @@ public abstract class DBManager {
     public void setSSLMode(boolean sslmode){
         JDBC = "";
         this.sslmode = sslmode;
+    }
+
+    /**
+     * Gets every schema within a connection and returns them as an Array.
+     * @return An array with all the schemas.
+     * @throws SQLException If connection fails.
+     */
+    public String[] getDatabases()
+    throws SQLException {
+        doConnect();
+        
+        ArrayList<String> databases = new ArrayList<>();
+        ResultSet result = connection.getMetaData().getCatalogs();
+
+        while(result.next())
+        {
+            databases.add(result.getString(1));
+        }
+
+        doClose();
+        return databases.toArray(new String[]{});
+    }
+
+    /**
+     * Gets every table within a connection and returns them as an Array.
+     * @return An array with tables in that database
+     * @throws SQLException If connection fails.
+     */
+    public String[] getTables()
+    throws SQLException {
+        doConnect();
+
+        ArrayList<String> tables = new ArrayList<>();
+        ResultSet result;
+        DBName = connection.getCatalog();
+        if (DBName != null)
+        {
+            // Getting all tables or just those in database
+            if (DBName.equals(""))
+                result = connection.getMetaData().getTables(null, null, "%", null);
+            else
+                result = connection.getMetaData().getTables(DBName, null, "%", null);
+            
+            while(result.next())
+            {
+                // 3 is the index for tables name
+                tables.add(result.getString(3));
+            }
+        } else {
+            throw new SQLException("Database is not selected.");
+        }
+        
+        doClose(result);
+        return tables.toArray(new String[]{});
+    }
+
+    /**
+     * Gets every column within a table and returns them as an array.
+     * @param table The table we want columns from.
+     * @return An array with all columns within a Table.
+     * @throws SQLException If connection fails.
+     */
+    public String[] getColumns(String table)
+    throws SQLException {
+        doConnect();
+
+        ArrayList<String> columns = new ArrayList<>();
+        ResultSet result;
+        DBName = connection.getCatalog();
+
+        // Getting all columns or just those in database
+        if (DBName.equals(""))
+            result = connection.getMetaData().getColumns(null, null, "%" + table + "%", null);
+        else
+            result = connection.getMetaData().getColumns(DBName, null, "%" + table + "%", null);
+        
+        while(result.next())
+        {
+            // 4 is the index for columns name
+            columns.add(result.getString(4));
+        }
+
+        doClose();
+        return columns.toArray(new String[]{});
     }
     
     /**

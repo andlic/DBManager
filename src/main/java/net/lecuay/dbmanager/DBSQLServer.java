@@ -230,14 +230,22 @@ public class DBSQLServer extends DBManager {
 
     @Override
     public void dropTable(String... tables) throws SQLException {
-        String sql = "DROP TABLE IF EXISTS " + String.join(", ", tables);
-        executeQuery(true, sql);
+        String sql;
+        for (String table: tables)
+        {
+            sql = "DROP TABLE " + table;
+            executeQuery(true, sql);
+        }
     }
 
     @Override
     public void dropDatabase(String... databases) throws SQLException {
-        String sql = "DROP DATABASE IF EXISTS " + String.join(", ", databases);
-        executeQuery(true, sql);
+        String sql;
+        for (String database: databases)
+        {
+            sql = "DROP DATABASE " + database;
+            executeQuery(true, sql);
+        }
     }
     
 }
