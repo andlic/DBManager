@@ -193,13 +193,17 @@ public class DBSQLServer extends DBManager {
 
         // Creating sentence
         String sql = "UPDATE " + table + " SET ";
+        StringBuilder dummy = new StringBuilder();
         // Since with lamda we need to scope a finally, we just create another variable
         Set<Entry<String, String>> entrySet = parsedUpdates.entrySet();
 
         for(Entry<String, String> entry: entrySet)
         {
-            sql += String.join(", ", entry.getKey() + " = " + entry.getValue());
+            dummy.append(entry.getKey() + " = " + entry.getValue()).append(", ");
         }
+
+        // Deleting ', '
+        dummy.delete(dummy.length() - 2, dummy.length());
 
         if (!condition.equals(""))
         {
