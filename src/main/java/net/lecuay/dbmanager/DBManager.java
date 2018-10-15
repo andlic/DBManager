@@ -17,9 +17,15 @@ import java.util.Scanner;
  * database managing.
  * 
  * @author LeCuay
- * @version 0.1 - Alpha
+ * @version 0.1 - Beta
  */
 public abstract class DBManager {
+
+    /** The author of the API */
+    private static String author = "LeCuay";
+
+    /** The version of the API */
+    private static String version = "0.1 - Beta";
 
     /** The user used in the connection. */
     protected String user;
@@ -291,13 +297,17 @@ public abstract class DBManager {
     throws SQLException {
         ArrayList<LinkedHashMap<String, String>> resultSelect = doSelect(table, condition, columns);
         // Getting literally any entry to get columns size
-        resultSelect.get(0).keySet().forEach(column -> System.out.print(column + " | "));
-        System.out.println();
-
-        resultSelect.forEach(select -> {
-            select.values().forEach(value -> System.out.print(value + " | "));
+        try {
+            resultSelect.get(0).keySet().forEach(column -> System.out.print(column + " | "));
             System.out.println();
-        });
+    
+            resultSelect.forEach(select -> {
+                select.values().forEach(value -> System.out.print(value + " | "));
+                System.out.println();
+            });
+        } catch (IndexOutOfBoundsException e) {
+            System.err.println("Empty set.");
+        }
     }
 
     /**
@@ -442,6 +452,16 @@ public abstract class DBManager {
     }
 
     /**
+     * Adds a property to the JDBC.
+     * @param key The key of the property.
+     * @param value The value of the property.
+     */
+    public void addProperty(String key, String value)
+    {
+        properties.setProperty(key, value);
+    }
+
+    /**
      * Gets every schema within a connection and returns them as an Array.
      * @return An array with all the schemas.
      * @throws SQLException If connection fails.
@@ -560,6 +580,22 @@ public abstract class DBManager {
      * @return {@code True} or {@code False}.
      */
     public boolean isSSLMode(){return this.sslmode;}
+
+    @Override
+    public String toString()
+    {
+        return String.format("- - - - - DBManager %s - - - - -\n"+
+                             "Connection type: %s\n"+
+                             "User: %s\n"+
+                             "Host: %s\n"+
+                             "Schema: %s\n"+
+                             "Port: %d\n"+
+                             "SSLMode: %s\n"+
+                             "- - - - - Created by %s - - - - -",
+                             DBManager.version, conexType.name(),
+                             user, host, DBName, port, sslmode,
+                             DBManager.author);
+    }
     
     // </editor-fold>
     

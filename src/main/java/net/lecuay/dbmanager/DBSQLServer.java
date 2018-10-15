@@ -17,7 +17,7 @@ import java.util.Map.Entry;
  * connections.
  * 
  * @author LeCuay
- * @version 0.1 - Alpha
+ * @version 0.1 - Beta
  * @see DBManager
  */
 public class DBSQLServer extends DBManager {
@@ -95,7 +95,15 @@ public class DBSQLServer extends DBManager {
             JDBC = "jdbc:sqlserver://"  + host + ":" + port + "/" + ";";
             // If SSL is required JDBC will be updated.
             if(sslmode)
-                JDBC += "integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
+            {
+                properties.setProperty("integratedSecurity", "true");
+                properties.setProperty("encrypt", "true");
+                properties.setProperty("trustServerCertificate", "true");
+            } else {
+                properties.setProperty("integratedSecurity", "false");
+                properties.setProperty("encrypt", "false");
+                properties.setProperty("trustServerCertificate", "false");
+            }
         }
         
 		connection = DriverManager.getConnection(JDBC, properties);
@@ -204,6 +212,7 @@ public class DBSQLServer extends DBManager {
 
         // Deleting ', '
         dummy.delete(dummy.length() - 2, dummy.length());
+        sql += dummy.toString();
 
         if (!condition.equals(""))
         {
