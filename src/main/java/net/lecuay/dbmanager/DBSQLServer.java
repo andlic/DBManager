@@ -17,7 +17,7 @@ import java.util.Map.Entry;
  * connections.
  * 
  * @author LeCuay
- * @version 0.1 - Alpha
+ * @version 0.1 - Beta
  * @see DBManager
  */
 public class DBSQLServer extends DBManager {
@@ -95,7 +95,15 @@ public class DBSQLServer extends DBManager {
             JDBC = "jdbc:sqlserver://"  + host + ":" + port + "/" + ";";
             // If SSL is required JDBC will be updated.
             if(sslmode)
-                JDBC += "integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
+            {
+                properties.setProperty("integratedSecurity", "true");
+                properties.setProperty("encrypt", "true");
+                properties.setProperty("trustServerCertificate", "true");
+            } else {
+                properties.setProperty("integratedSecurity", "false");
+                properties.setProperty("encrypt", "false");
+                properties.setProperty("trustServerCertificate", "false");
+            }
         }
         
 		connection = DriverManager.getConnection(JDBC, properties);
@@ -193,13 +201,18 @@ public class DBSQLServer extends DBManager {
 
         // Creating sentence
         String sql = "UPDATE " + table + " SET ";
+        StringBuilder dummy = new StringBuilder();
         // Since with lamda we need to scope a finally, we just create another variable
         Set<Entry<String, String>> entrySet = parsedUpdates.entrySet();
 
         for(Entry<String, String> entry: entrySet)
         {
-            sql += String.join(", ", entry.getKey() + " = " + entry.getValue());
+            dummy.append(entry.getKey() + " = " + entry.getValue()).append(", ");
         }
+
+        // Deleting ', '
+        dummy.delete(dummy.length() - 2, dummy.length());
+        sql += dummy.toString();
 
         if (!condition.equals(""))
         {
@@ -230,14 +243,22 @@ public class DBSQLServer extends DBManager {
 
     @Override
     public void dropTable(String... tables) throws SQLException {
-        String sql = "DROP TABLE IF EXISTS " + String.join(", ", tables);
-        executeQuery(true, sql);
+        String sql;
+        for (String table: tables)
+        {
+            sql = "DROP TABLE " + table;
+            executeQuery(true, sql);
+        }
     }
 
     @Override
     public void dropDatabase(String... databases) throws SQLException {
-        String sql = "DROP DATABASE IF EXISTS " + String.join(", ", databases);
-        executeQuery(true, sql);
+        String sql;
+        for (String database: databases)
+        {
+            sql = "DROP DATABASE " + database;
+            executeQuery(true, sql);
+        }
     }
     
 }

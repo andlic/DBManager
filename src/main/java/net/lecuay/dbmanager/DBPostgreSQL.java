@@ -17,7 +17,7 @@ import java.util.Map.Entry;
  * connections.
  * 
  * @author LeCuay
- * @version 0.1 - Alpha
+ * @version 0.1 - Beta
  * @see DBManager
  */
 public class DBPostgreSQL extends DBManager {
@@ -93,7 +93,12 @@ public class DBPostgreSQL extends DBManager {
             JDBC = "jdbc:postgresql://" + host + ":" + port + "/" + DBName;
             // If SSL is required JDBC will be updated.
             if(sslmode)
-                JDBC += "?ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory";
+            {
+                properties.setProperty("ssl", "true");
+                properties.setProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
+            } else {
+                properties.setProperty("ssl", "false");
+            }
         }
         
         connection = DriverManager.getConnection(JDBC, properties);
@@ -108,7 +113,7 @@ public class DBPostgreSQL extends DBManager {
         StringBuilder codeSQL = new StringBuilder("SELECT ");
         
         codeSQL.append(String.join(", ", columns));
-        codeSQL.append(" FROM ").append(table);
+        codeSQL.append(" FROM ").append("\"" + table + "\"");
         
         if (!(condition.isEmpty() || condition.trim().isEmpty())) {
             codeSQL.append(" WHERE ").append(condition);
@@ -191,14 +196,19 @@ public class DBPostgreSQL extends DBManager {
 
         // Creating sentence
         String sql = "UPDATE \"" + table + "\" SET ";
+        StringBuilder dummy = new StringBuilder();
         // Since with lamda we need to scope a finally, we just create another variable
         Set<Entry<String, String>> entrySet = parsedUpdates.entrySet();
 
         for(Entry<String, String> entry: entrySet)
         {
-            sql += String.join(", ", "\"" + entry.getKey() + "\" = " + entry.getValue());
+            dummy.append("\"" + entry.getKey() + "\" = " + entry.getValue()).append(", ");
         }
 
+        // Deleting ', '
+        dummy.delete(dummy.length() - 2, dummy.length());
+        sql += dummy.toString();
+        
         if (!condition.equals(""))
         {
             sql += " WHERE " + condition;

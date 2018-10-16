@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -16,9 +17,15 @@ import java.util.Scanner;
  * database managing.
  * 
  * @author LeCuay
- * @version 0.1 - Alpha
+ * @version 0.1 - Beta
  */
 public abstract class DBManager {
+
+    /** The author of the API */
+    private static String author = "LeCuay";
+
+    /** The version of the API */
+    private static String version = "0.1 - Beta";
 
     /** The user used in the connection. */
     protected String user;
@@ -290,13 +297,17 @@ public abstract class DBManager {
     throws SQLException {
         ArrayList<LinkedHashMap<String, String>> resultSelect = doSelect(table, condition, columns);
         // Getting literally any entry to get columns size
-        resultSelect.get(0).keySet().forEach(column -> System.out.print(column + " | "));
-        System.out.println();
-
-        resultSelect.forEach(select -> {
-            select.values().forEach(value -> System.out.print(value + " | "));
+        try {
+            resultSelect.get(0).keySet().forEach(column -> System.out.print(column + " | "));
             System.out.println();
-        });
+    
+            resultSelect.forEach(select -> {
+                select.values().forEach(value -> System.out.print(value + " | "));
+                System.out.println();
+            });
+        } catch (IndexOutOfBoundsException e) {
+            System.err.println("Empty set.");
+        }
     }
 
     /**
@@ -439,6 +450,100 @@ public abstract class DBManager {
         JDBC = "";
         this.sslmode = sslmode;
     }
+
+    /**
+     * Adds a property to the JDBC.
+     * @param key The key of the property.
+     * @param value The value of the property.
+     */
+    public void addProperty(String key, String value)
+    {
+        properties.setProperty(key, value);
+    }
+
+    /**
+     * Gets every schema within a connection and returns them as an Array.
+     * @return An array with all the schemas.
+     * @throws SQLException If connection fails.
+     */
+    public String[] getDatabases()
+    throws SQLException {
+        doConnect();
+        
+        ArrayList<String> databases = new ArrayList<>();
+        ResultSet result = connection.getMetaData().getCatalogs();
+
+        while(result.next())
+        {
+            databases.add(result.getString(1));
+        }
+
+        doClose();
+        return databases.toArray(new String[]{});
+    }
+
+    /**
+     * Gets every table within a connection and returns them as an Array.
+     * @return An array with tables in that database
+     * @throws SQLException If connection fails.
+     */
+    public String[] getTables()
+    throws SQLException {
+        doConnect();
+
+        ArrayList<String> tables = new ArrayList<>();
+        ResultSet result;
+        DBName = connection.getCatalog();
+        if (DBName != null)
+        {
+            // Getting all tables or just those in database
+            if (DBName.equals(""))
+                result = connection.getMetaData().getTables(null, null, "%", null);
+            else
+                result = connection.getMetaData().getTables(DBName, null, "%", null);
+            
+            while(result.next())
+            {
+                // 3 is the index for tables name
+                tables.add(result.getString(3));
+            }
+        } else {
+            throw new SQLException("Database is not selected.");
+        }
+        
+        doClose(result);
+        return tables.toArray(new String[]{});
+    }
+
+    /**
+     * Gets every column within a table and returns them as an array.
+     * @param table The table we want columns from.
+     * @return An array with all columns within a Table.
+     * @throws SQLException If connection fails.
+     */
+    public String[] getColumns(String table)
+    throws SQLException {
+        doConnect();
+
+        ArrayList<String> columns = new ArrayList<>();
+        ResultSet result;
+        DBName = connection.getCatalog();
+
+        // Getting all columns or just those in database
+        if (DBName.equals(""))
+            result = connection.getMetaData().getColumns(null, null, "%" + table + "%", null);
+        else
+            result = connection.getMetaData().getColumns(DBName, null, "%" + table + "%", null);
+        
+        while(result.next())
+        {
+            // 4 is the index for columns name
+            columns.add(result.getString(4));
+        }
+
+        doClose();
+        return columns.toArray(new String[]{});
+    }
     
     /**
      * Returns the user used for the connection.
@@ -475,6 +580,22 @@ public abstract class DBManager {
      * @return {@code True} or {@code False}.
      */
     public boolean isSSLMode(){return this.sslmode;}
+
+    @Override
+    public String toString()
+    {
+        return String.format("- - - - - DBManager %s - - - - -\n"+
+                             "Connection type: %s\n"+
+                             "User: %s\n"+
+                             "Host: %s\n"+
+                             "Schema: %s\n"+
+                             "Port: %d\n"+
+                             "SSLMode: %s\n"+
+                             "- - - - - Created by %s - - - - -",
+                             DBManager.version, conexType.name(),
+                             user, host, DBName, port, sslmode,
+                             DBManager.author);
+    }
     
     // </editor-fold>
     
