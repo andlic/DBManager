@@ -13,3 +13,6 @@ target/
 
 # Test
 test/
+
+# Documentation
+docs/

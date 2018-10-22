@@ -97,6 +97,7 @@ public class DBMySQL extends DBManager {
             }
         }
 
+        properties.setProperty("allowPublicKeyRetrieval", "true");
         connection = DriverManager.getConnection(JDBC, properties);
     }
 
