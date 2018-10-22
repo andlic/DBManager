@@ -210,6 +210,7 @@ public abstract class DBManager {
      * <b>Example of use:</b><br>
      * <i>Assuming we have the following table 'users':</i>
      * <table>
+     *  <caption>users</caption>
      *  <tr>
      *   <th>id</th>
      *   <th>name</th>
@@ -226,18 +227,18 @@ public abstract class DBManager {
      *   <td>2</td>
      *   <td>John Smith</td>
      *   <td>332.21</td>
-     *   <td>testemail&#64hotmail.com</td>
+     *   <td>testemail&#64;hotmail.com</td>
      *  </tr>
      * </table>
      * 
      * <pre>
      * // We already have an object DBManager connection.
      * String sql = "SELECT name FROM users; SELECT COUNT(id) FROM users;";
-     * connection.doExecuteWithReturn(sql).forEach(query -> {
+     * connection.doExecuteWithReturn(sql).forEach(query -&gt; {
      *  // The first one will be the select with name
      *  // The second one will be the count of id
      * 
-     *  query.forEach(entry -> {
+     *  query.forEach(entry -&gt; {
      *      // Now we read every entry got by our select
      *      System.out.println(entry);
      *  });
