@@ -2,7 +2,6 @@ package net.lecuay.dbmanager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +9,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Properties;
-import java.util.Scanner;
 
 /**
  * This abstract class declares a DB connection that will make easier
@@ -120,7 +118,7 @@ public abstract class DBManager {
      * Creates a connection based on a given URI.
      * @param uri The object {@link java.net.URI} used for the connection. 
      */
-    protected DBManager(URI uri)
+    protected DBManager(java.net.URI uri)
     {
         // Since UserInfo works by user:password we are getting each
         user = uri.getUserInfo().split(":")[0];
@@ -199,9 +197,69 @@ public abstract class DBManager {
         // Check if SQL exists and is a file
         if (file.exists() && file.isFile())
         {
-            executeFile(file, true);
+            executeFile(file, commit);
         } else {
-            executeQuery(true, sql);
+            executeQuery(commit, sql);
+        }
+    }
+
+    /**
+     * Executes either SQL code or a File SQL <i>(archive.sql)</i>
+     * and returns result as {@code ArrayList<LinkedHashMap<String, String>>}.<br>
+     * 
+     * <b>Example of use:</b><br>
+     * <i>Assuming we have the following table 'users':</i>
+     * <table>
+     *  <tr>
+     *   <th>id</th>
+     *   <th>name</th>
+     *   <th>money</th>
+     *   <th>email</th>
+     *  </tr>
+     *  <tr>
+     *   <td>1</td>
+     *   <td>LeCuay</td>
+     *   <td>125.43</td>
+     *   <td>thisisnotmyemail&#64;live.com</td>
+     *  </tr>
+     *  <tr>
+     *   <td>2</td>
+     *   <td>John Smith</td>
+     *   <td>332.21</td>
+     *   <td>testemail&#64hotmail.com</td>
+     *  </tr>
+     * </table>
+     * 
+     * <pre>
+     * // We already have an object DBManager connection.
+     * String sql = "SELECT name FROM users; SELECT COUNT(id) FROM users;";
+     * connection.doExecuteWithReturn(sql).forEach(query -> {
+     *  // The first one will be the select with name
+     *  // The second one will be the count of id
+     * 
+     *  query.forEach(entry -> {
+     *      // Now we read every entry got by our select
+     *      System.out.println(entry);
+     *  });
+     * });
+     * </pre>
+     * @param sql SQL code or path to the File SQL.
+     * @return An array with every {@link java.util.ArrayList} with each entry in our table. Also each {@link java.util.ArrayList}
+     * has a {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and <i>Value of column</i> as {@code Value}.
+     * @throws FileNotFoundException If file cannot be accessed.
+     * @throws SQLException If SQL syntax error or Connection error is raised.
+     * 
+     * @see DBManager#executeQueryWithReturn(String...)
+     */
+    public ArrayList<ArrayList<LinkedHashMap<String, String>>> doExecuteWithReturn(String sql)
+    throws FileNotFoundException, SQLException {
+        File file = new File(sql);
+        // Check if SQL exists and is a file
+        if (file.exists() && file.isFile())
+        {
+            return executeFileWithReturn(file);
+        } else {
+            return executeQueryWithReturn(sql);
         }
     }
 
@@ -215,7 +273,7 @@ public abstract class DBManager {
     protected void executeFile(File fileSQL, boolean commit)
     throws FileNotFoundException, SQLException {
         String sql = "";
-        Scanner reader = new Scanner(fileSQL);
+        java.util.Scanner reader = new java.util.Scanner(fileSQL);
 
         while(reader.hasNext())
         {
@@ -226,6 +284,31 @@ public abstract class DBManager {
         // Getting each query by ';' character
         String[] queries = sql.split(";");
         executeQuery(commit, queries);
+    }
+
+    /**
+     * Executes a SQL file query-by-query and returns result.
+     * @param fileSQL The SQL file to execute.
+     * @return An array with the result format.
+     * @throws FileNotFoundException In case file cannot be found.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     * 
+     * @see DBManager#executeQueryWithReturn(String...)
+     */
+    protected ArrayList<ArrayList<LinkedHashMap<String, String>>> executeFileWithReturn(File fileSQL)
+    throws FileNotFoundException, SQLException {
+        String sql = "";
+        java.util.Scanner reader = new java.util.Scanner(fileSQL);
+
+        while(reader.hasNext())
+        {
+            sql += reader.next() + " ";
+        }
+        reader.close();
+
+        // Getting each query by ';' character
+        String[] queries = sql.split(";");
+        return executeQueryWithReturn(queries);
     }
 
     /**
@@ -262,6 +345,41 @@ public abstract class DBManager {
     }
 
     /**
+     * Executes SQL code and returns result as {@code ArrayList<LinkedHasMap>}.
+     * @param codeSQL Array of SQL code to execute.
+     * @return An array with every {@link java.util.ArrayList} with each entry in our table. Also each {@link java.util.ArrayList}
+     * has a {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and <i>Value of column</i> as {@code Value}.
+     * @throws SQLException If SQL syntax error or connection error raises.
+     */
+    protected ArrayList<ArrayList<LinkedHashMap<String, String>>> executeQueryWithReturn(String... codeSQL)
+    throws SQLException {
+        doConnect();
+        ArrayList<ArrayList<LinkedHashMap<String, String>>> selectResult = new ArrayList<>();
+        Statement stm = connection.createStatement();
+        ResultSet result = stm.getResultSet();
+
+        for (int i = 0; i < codeSQL.length; i++) {
+            // Creating ArrayList for each query
+            selectResult.add(new ArrayList<>());
+            result = stm.executeQuery(codeSQL[i]);
+
+            while (result.next())
+            {
+                selectResult.get(i).add(new LinkedHashMap<>());
+                for (int j = 0; j < result.getMetaData().getColumnCount(); j++) {
+                    // selectResult.get(i).get(selectResult.get(i).size() - 1) will get the very last item
+                    selectResult.get(i).get(selectResult.get(i).size() - 1).put(result.getMetaData().getColumnName(j+1), result.getString(j+1));
+                }
+            }
+
+            result.close();
+        }
+
+        doClose(stm, result);
+        return selectResult;
+    }
+
+    /**
      * This method will return an <code>{@literal ArrayList<Map<Column, Value of Column>>}</code>
      * for example:<br>
      * 
@@ -269,9 +387,9 @@ public abstract class DBManager {
      * columns: <i>id</i>, <i>name</i>, <i>country</i> we must use:</b>
      * 
      * <pre>
-     * // Create object conex
+     * // Create object connection
      * {@literal ArrayList<LinkedHashMap<String, String>>} select;
-     * select = conex.doSelect("sample", "", "id", "name", "country");
+     * select = connection.doSelect("sample", "", "id", "name", "country");
      * </pre>
      * Our <i>select</i> object now is filled with 3 {@link java.util.Map}, each map has
      * <i>id</i>, <i>name</i>, <i>country</i> as {@code Keys} and its respective values.
@@ -316,8 +434,8 @@ public abstract class DBManager {
      * For example, assuming that we want to insert <i>name</i>, <i>coins</i> and <i>id</i> into
      * <i>sample</i> table we have to use the following lines:
      * <pre>
-     * // DBManager instace conex
-     * conex.doInsert("sample", "name='LeCuay'", "coins=12.5", "id=12")
+     * // DBManager instace connection
+     * connection.doInsert("sample", "name='LeCuay'", "coins=12.5", "id=12")
      * </pre>
      * <b>Is very important to follow the correct syntax: values between <i>''</i> for Strings
      * and plain for numbers.</b>
@@ -334,8 +452,8 @@ public abstract class DBManager {
      * For example, assuming we want to change every <i>name</i> value starting by
      * "Jr." for "Mr." we will use the following code:
      * <pre>
-     * // DBManager instance conex
-     * conex.doUpdate("sample", "name LIKE 'Jr.%'", "name='Mr. ' + name");
+     * // DBManager instance connection
+     * connection.doUpdate("sample", "name LIKE 'Jr.%'", "name='Mr. ' + name");
      * </pre>
      * <b>Is very important to follow the correct syntax: values between <i>''</i> for Strings
      * and plain for numbers.</b>
@@ -361,8 +479,8 @@ public abstract class DBManager {
      * For exaple, assuming we want to create the table 'persons' with <i>id (integer primary key)</i>,
      * <i>name (varchar(255))</i> and <i>age (integer(4))</i> we will use the follow code:
      * <pre>
-     * // DBManager instance conex
-     * conex.createTable("persons", "id INTEGER PRIMARY KEY",
+     * // DBManager instance connection
+     * connection.createTable("persons", "id INTEGER PRIMARY KEY",
      *                              "name VARCHAR(255)",
      *                              "age INTEGER(4)");
      * </pre>
@@ -543,6 +661,50 @@ public abstract class DBManager {
 
         doClose();
         return columns.toArray(new String[]{});
+    }
+
+    /**
+     * Returns an array of Strings with columns information.
+     * @param table The table used to extract columns information.
+     * @return An array with all columns and detailed information.
+     * @throws SQLException If connection fails.
+     */
+    public String[] getColumnsInfo(String table)
+    throws SQLException {
+        doConnect();
+
+        ResultSet result, rstPrimaryKeys;
+        ArrayList<String> columnInfo = new ArrayList<>();
+        ArrayList<String> primaryKeys = new ArrayList<>();
+
+        // Getting all columns or just those in database
+        if (DBName.equals(""))
+        {
+            result = connection.getMetaData().getColumns(null, null, "%" + table + "%", null);
+            rstPrimaryKeys = connection.getMetaData().getPrimaryKeys(null, "", "%" + table + "%");
+        } else {
+            result = connection.getMetaData().getColumns(DBName, null, "%" + table + "%", null);
+            rstPrimaryKeys = connection.getMetaData().getPrimaryKeys(DBName, "", "%" + table + "%");
+        }
+
+        while(rstPrimaryKeys.next())
+        {
+            primaryKeys.add(rstPrimaryKeys.getString(4));
+        }
+
+        while(result.next())
+        {
+            columnInfo.add(String.format("%s %s(%s%s)%s%s",
+                                        result.getString(4),
+                                        result.getString(6),
+                                        result.getString(7),
+                                        result.getString(9)!=null?", "+result.getString(9):"",
+                                        primaryKeys.contains(result.getString(4))?" PRIMARY KEY":"",
+                                        result.getString(11).equals("0")?" NOT NULL":""));
+        }
+        
+        doClose(result, rstPrimaryKeys);
+        return columnInfo.toArray(new String[]{});
     }
     
     /**
