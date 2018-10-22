@@ -3,14 +3,12 @@ package net.lecuay.dbmanager;
 import java.net.URI;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Class created as instance of {@link DBManager} to manage PostgreSQL
@@ -107,9 +105,6 @@ public class DBPostgreSQL extends DBManager {
     @Override
     public ArrayList<LinkedHashMap<String, String>> doSelect(String table, String condition, String... columns)
     throws SQLException {
-        doConnect();
-
-        ArrayList<LinkedHashMap<String, String>> selectResult = new ArrayList<>();
         StringBuilder codeSQL = new StringBuilder("SELECT ");
         
         codeSQL.append(String.join(", ", columns));
@@ -119,38 +114,7 @@ public class DBPostgreSQL extends DBManager {
             codeSQL.append(" WHERE ").append(condition);
         }
 
-        Statement stm = connection.createStatement();
-        ResultSet result = stm.executeQuery(codeSQL.toString());
-        ResultSetMetaData resultData = result.getMetaData();
-        
-        // Checking if user wants every data from a table
-        if(columns[0].equals("*"))
-        {
-            while(result.next())
-            {
-                // Creating a new Map for each element in columns
-                selectResult.add(new LinkedHashMap<>());
-                for(int i = 1; i <= resultData.getColumnCount(); ++i)
-                {
-                    // Adding values to that element
-                    selectResult.get(selectResult.size() - 1).put(resultData.getColumnName(i), result.getString(i));
-                }
-            }
-        } else {
-            while (result.next())
-            {
-                // Creating a new Map for each element in columns
-                selectResult.add(new LinkedHashMap<>());
-                for (int i = 0; i < columns.length; ++i)
-                {
-                    // Adding values to that element
-                    selectResult.get(selectResult.size() - 1).put(columns[i], result.getString(i + 1));
-                }
-            }
-        }
-        
-        doClose(stm, result);
-        return selectResult;
+        return executeQueryWithReturn(codeSQL.toString()).get(0);
     }
 
 	@Override
@@ -252,5 +216,43 @@ public class DBPostgreSQL extends DBManager {
         }
     }
 
-    
+    @Override
+    public String[] getColumnsInfo(String table)
+    throws SQLException {
+        doConnect();
+
+        ResultSet result;
+        ArrayList<String> columnInfo = new ArrayList<>();
+        ArrayList<String> primaryKeys = new ArrayList<>();
+        
+        // Getting all columns or just those in database
+        if (DBName.equals(""))
+        {
+            result = connection.getMetaData().getColumns(null, null, "%" + table + "%", null);
+        } else {
+            result = connection.getMetaData().getColumns(DBName, null, "%" + table + "%", null);
+        }
+
+        executeQueryWithReturn("select column_name, constraint_name "+
+                               "from information_schema.key_column_usage "+
+                               "where table_catalog='aed' and table_name='clientes_premium';").get(0)
+        .forEach(entry -> {
+            primaryKeys.add(entry.get("column_name"));
+        });
+        
+        while(result.next())
+        {
+            columnInfo.add(String.format("%s %s(%s%s)%s%s",
+                                         result.getString(4),
+                                         result.getString(6).indexOf("bpchar")!=-1?"character":result.getString(6),
+                                         result.getString(7),
+                                         result.getString(9)!=null?", "+result.getString(9):"",
+                                         primaryKeys.contains(result.getString(4))?" PRIMARY KEY":"",
+                                         result.getString(11).equals("0")?" NOT NULL":""));
+        }
+
+        doClose(result);
+        return columnInfo.toArray(new String[]{});
+    }
+
 }
