@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Class created as instance of {@link DBManager} to manage PostgreSQL
  * connections.
- * 
+ *
  * @author LeCuay
  * @version 0.1 - Beta
  * @see DBManager
@@ -22,6 +22,7 @@ public class DBPostgreSQL extends DBManager {
 
     /**
      * Creates a connection with the parameters given.
+     *
      * @param user The user used for the connection.
      * @param password The password used for the connecion.
      * @param host The host where our Database is hosted.
@@ -29,28 +30,27 @@ public class DBPostgreSQL extends DBManager {
      * @param port The port used for the connection.
      * @param sslmode Declares if SSL is required.
      */
-    public DBPostgreSQL(String user, String password, String host, String DBName, int port, boolean sslmode)
-    {
+    public DBPostgreSQL(String user, String password, String host, String DBName, int port, boolean sslmode) {
         super(user, password, host, DBName, DBType.MYSQL, port, sslmode);
     }
 
     /**
      * Creates a connection based on a given <b>JDBC</b>.
+     *
      * @param user The user used for the connection.
      * @param password The password used for the connection.
      * @param JDBC The customized JDBC given.
      */
-    public DBPostgreSQL(String user, String password, String JDBC)
-    {
+    public DBPostgreSQL(String user, String password, String JDBC) {
         super(user, password, JDBC);
     }
 
     /**
      * Creates a connection based on a given URI.
-     * @param uri The object {@link java.net.URI} used for the connection. 
+     *
+     * @param uri The object {@link java.net.URI} used for the connection.
      */
-    public DBPostgreSQL(URI uri)
-    {
+    public DBPostgreSQL(URI uri) {
         super(uri);
     }
 
@@ -69,47 +69,45 @@ public class DBPostgreSQL extends DBManager {
      * DBPostgreSQL conex = DBPostgreSQL("username", "password");
      * conex.setDBName("sampleDatabase");
      * </pre>
+     *
      * @param user The user used for the connection.
      * @param password The password used for the connection.
      */
-    public DBPostgreSQL(String user, String password)
-    {
+    public DBPostgreSQL(String user, String password) {
         super(user, password, "localhost", "", DBType.MYSQL, 5432, false);
     }
 
     @Override
     protected void doConnect()
-    throws SQLException {
+            throws SQLException {
         try {
             Class.forName("org.postgresql.Driver");
-        } catch(ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             System.out.println("Driver not found! -> " + e.getMessage());
         }
 
-        if (JDBC.equals(""))
-        {
+        if (JDBC.equals("")) {
             JDBC = "jdbc:postgresql://" + host + ":" + port + "/" + DBName;
             // If SSL is required JDBC will be updated.
-            if(sslmode)
-            {
+            if (sslmode) {
                 properties.setProperty("ssl", "true");
                 properties.setProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
             } else {
                 properties.setProperty("ssl", "false");
             }
         }
-        
+
         connection = DriverManager.getConnection(JDBC, properties);
     }
 
     @Override
     public ArrayList<LinkedHashMap<String, String>> doSelect(String table, String condition, String... columns)
-    throws SQLException {
+            throws SQLException {
         StringBuilder codeSQL = new StringBuilder("SELECT ");
-        
+
         codeSQL.append(String.join(", ", columns));
-        codeSQL.append(" FROM ").append("\"" + table + "\"");
-        
+        codeSQL.append(" FROM ").append("\"").append(table).append("\"");
+
         if (!(condition.isEmpty() || condition.trim().isEmpty())) {
             codeSQL.append(" WHERE ").append(condition);
         }
@@ -117,16 +115,14 @@ public class DBPostgreSQL extends DBManager {
         return executeQueryWithReturn(codeSQL.toString()).get(0);
     }
 
-	@Override
+    @Override
     public void doInsert(String table, String... inserts)
-    throws SQLException {
+            throws SQLException {
         HashMap<String, String> parsedInserts = new HashMap<>();
 
-        for (String insert: inserts)
-        {
+        for (String insert : inserts) {
             // Checks if insert syntax is correct
-            if(insert.indexOf("=") == -1)
-            {
+            if (!insert.contains("=")) {
                 throw new SQLException("Syntax error: Inserts have to follow the next syntax 'columnName=value'");
             }
             // Inserts follows column=value so we have to store each
@@ -139,19 +135,17 @@ public class DBPostgreSQL extends DBManager {
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
 
         executeQuery(true, sql);
-	}
+    }
 
     @Override
     public void doUpdate(String table, String condition, String... updates)
-    throws SQLException {
+            throws SQLException {
         // Our HashMap will store column and value
         HashMap<String, String> parsedUpdates = new HashMap<>();
 
-        for(String update: updates)
-        {
+        for (String update : updates) {
             // Checks if insert syntax is correct
-            if(update.indexOf("=") == -1)
-            {
+            if (!update.contains("=")) {
                 throw new SQLException("Syntax error: Inserts have to follow the next syntax 'columnName=value'");
             }
             // Inserts follows column=value so we have to store each
@@ -164,20 +158,18 @@ public class DBPostgreSQL extends DBManager {
         // Since with lamda we need to scope a finally, we just create another variable
         Set<Entry<String, String>> entrySet = parsedUpdates.entrySet();
 
-        for(Entry<String, String> entry: entrySet)
-        {
-            dummy.append("\"" + entry.getKey() + "\" = " + entry.getValue()).append(", ");
-        }
+        entrySet.forEach((entry) -> {
+            dummy.append("\"").append(entry.getKey()).append("\" = ").append(entry.getValue()).append(", ");
+        });
 
         // Deleting ', '
         dummy.delete(dummy.length() - 2, dummy.length());
         sql += dummy.toString();
-        
-        if (!condition.equals(""))
-        {
+
+        if (!condition.equals("")) {
             sql += " WHERE " + condition;
         }
-        
+
         executeQuery(true, sql);
     }
 
@@ -209,8 +201,7 @@ public class DBPostgreSQL extends DBManager {
     @Override
     public void dropDatabase(String... databases) throws SQLException {
         String sql;
-        for(String db: databases)
-        {
+        for (String db : databases) {
             sql = "DROP DATABASE IF EXISTS \"" + db + "\"";
             executeQuery(true, sql);
         }
@@ -218,37 +209,35 @@ public class DBPostgreSQL extends DBManager {
 
     @Override
     public String[] getColumnsInfo(String table)
-    throws SQLException {
+            throws SQLException {
         doConnect();
 
         ResultSet result;
         ArrayList<String> columnInfo = new ArrayList<>();
         ArrayList<String> primaryKeys = new ArrayList<>();
-        
+
         // Getting all columns or just those in database
-        if (DBName.equals(""))
-        {
+        if (DBName.equals("")) {
             result = connection.getMetaData().getColumns(null, null, "%" + table + "%", null);
         } else {
             result = connection.getMetaData().getColumns(DBName, null, "%" + table + "%", null);
         }
 
-        executeQueryWithReturn("select column_name, constraint_name "+
-                               "from information_schema.key_column_usage "+
-                               "where table_catalog='aed' and table_name='clientes_premium';").get(0)
-        .forEach(entry -> {
-            primaryKeys.add(entry.get("column_name"));
-        });
-        
-        while(result.next())
-        {
+        executeQueryWithReturn("select column_name, constraint_name "
+                + "from information_schema.key_column_usage "
+                + "where table_catalog='aed' and table_name='clientes_premium';").get(0)
+                .forEach(entry -> {
+                    primaryKeys.add(entry.get("column_name"));
+                });
+
+        while (result.next()) {
             columnInfo.add(String.format("%s %s(%s%s)%s%s",
-                                         result.getString(4),
-                                         result.getString(6).indexOf("bpchar")!=-1?"character":result.getString(6),
-                                         result.getString(7),
-                                         result.getString(9)!=null?", "+result.getString(9):"",
-                                         primaryKeys.contains(result.getString(4))?" PRIMARY KEY":"",
-                                         result.getString(11).equals("0")?" NOT NULL":""));
+                    result.getString(4),
+                    result.getString(6).contains("bpchar") ? "character" : result.getString(6),
+                    result.getString(7),
+                    result.getString(9) != null ? ", " + result.getString(9) : "",
+                    primaryKeys.contains(result.getString(4)) ? " PRIMARY KEY" : "",
+                    result.getString(11).equals("0") ? " NOT NULL" : ""));
         }
 
         doClose(result);

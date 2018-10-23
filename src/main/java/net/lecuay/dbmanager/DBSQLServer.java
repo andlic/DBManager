@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Class created as instance of {@link DBManager} to manage SQL Server
  * connections.
- * 
+ *
  * @author LeCuay
  * @version 0.1 - Beta
  * @see DBManager
@@ -21,6 +21,7 @@ public class DBSQLServer extends DBManager {
 
     /**
      * Declares parameters used for a connection.
+     *
      * @param user The user used for the connection.
      * @param password The password used for the connecion.
      * @param host The host where our Database is hosted.
@@ -28,8 +29,7 @@ public class DBSQLServer extends DBManager {
      * @param port The port used for the connection.
      * @param sslmode Declares if SSL is required.
      */
-    public DBSQLServer(String user, String password, String host, String DBName, int port, boolean sslmode)
-    {
+    public DBSQLServer(String user, String password, String host, String DBName, int port, boolean sslmode) {
         super(user, password, host, DBName, DBType.SQLSERVER, port, sslmode);
 
         properties.setProperty("databaseName", this.DBName);
@@ -37,21 +37,21 @@ public class DBSQLServer extends DBManager {
 
     /**
      * Creates a connection based on a given <b>JDBC</b>.
+     *
      * @param user The user used for the connection.
      * @param password The password used for the connection.
      * @param JDBC The customized JDBC given.
      */
-    public DBSQLServer(String user, String password, String JDBC)
-    {
+    public DBSQLServer(String user, String password, String JDBC) {
         super(user, password, JDBC);
     }
 
     /**
      * Creates a connection based on a given URI.
-     * @param uri The object {@link java.net.URI} used for the connection. 
+     *
+     * @param uri The object {@link java.net.URI} used for the connection.
      */
-    public DBSQLServer(URI uri)
-    {
+    public DBSQLServer(URI uri) {
         super(uri);
     }
 
@@ -70,29 +70,27 @@ public class DBSQLServer extends DBManager {
      * DBSQLServer conex = DBSQLServer("username", "password");
      * conex.setDBName("sampleDatabase");
      * </pre>
+     *
      * @param user The user used for the connection.
      * @param password The password used for the connection.
      */
-    public DBSQLServer(String user, String password)
-    {
+    public DBSQLServer(String user, String password) {
         super(user, password, "localhost", "", DBType.SQLSERVER, 1433, false);
     }
 
     @Override
     protected void doConnect()
-    throws SQLException {
+            throws SQLException {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        } catch(ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             System.out.println("Driver not found! -> " + e.getMessage());
         }
 
-        if (JDBC.equals(""))
-        {
-            JDBC = "jdbc:sqlserver://"  + host + ":" + port + "/" + ";";
+        if (JDBC.equals("")) {
+            JDBC = "jdbc:sqlserver://" + host + ":" + port + "/" + ";";
             // If SSL is required JDBC will be updated.
-            if(sslmode)
-            {
+            if (sslmode) {
                 properties.setProperty("integratedSecurity", "true");
                 properties.setProperty("encrypt", "true");
                 properties.setProperty("trustServerCertificate", "true");
@@ -102,18 +100,18 @@ public class DBSQLServer extends DBManager {
                 properties.setProperty("trustServerCertificate", "false");
             }
         }
-        
-		connection = DriverManager.getConnection(JDBC, properties);
+
+        connection = DriverManager.getConnection(JDBC, properties);
     }
 
     @Override
     public ArrayList<LinkedHashMap<String, String>> doSelect(String table, String condition, String... columns)
-    throws SQLException {
+            throws SQLException {
         StringBuilder codeSQL = new StringBuilder("SELECT ");
-        
+
         codeSQL.append(String.join(", ", columns));
         codeSQL.append(" FROM ").append(table);
-        
+
         if (!(condition.isEmpty() || condition.trim().isEmpty())) {
             codeSQL.append(" WHERE ").append(condition);
         }
@@ -121,16 +119,14 @@ public class DBSQLServer extends DBManager {
         return executeQueryWithReturn(codeSQL.toString()).get(0);
     }
 
-	@Override
+    @Override
     public void doInsert(String table, String... inserts)
-    throws SQLException {
+            throws SQLException {
         HashMap<String, String> parsedInserts = new HashMap<>();
 
-        for (String insert: inserts)
-        {
+        for (String insert : inserts) {
             // Checks if insert syntax is correct
-            if(insert.indexOf("=") == -1)
-            {
+            if (!insert.contains("=")) {
                 throw new SQLException("Syntax error: Inserts have to follow the next syntax 'columnName=value'");
             }
             // Inserts follows column=value so we have to store each
@@ -143,19 +139,17 @@ public class DBSQLServer extends DBManager {
         sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
 
         executeQuery(true, sql);
-	}
+    }
 
     @Override
     public void doUpdate(String table, String condition, String... updates)
-    throws SQLException {
+            throws SQLException {
         // Our HashMap will store column and value
         HashMap<String, String> parsedUpdates = new HashMap<>();
 
-        for(String update: updates)
-        {
+        for (String update : updates) {
             // Checks if insert syntax is correct
-            if(update.indexOf("=") == -1)
-            {
+            if (!update.contains("=")) {
                 throw new SQLException("Syntax error: Inserts have to follow the next syntax 'columnName=value'");
             }
             // Inserts follows column=value so we have to store each
@@ -168,20 +162,18 @@ public class DBSQLServer extends DBManager {
         // Since with lamda we need to scope a finally, we just create another variable
         Set<Entry<String, String>> entrySet = parsedUpdates.entrySet();
 
-        for(Entry<String, String> entry: entrySet)
-        {
-            dummy.append(entry.getKey() + " = " + entry.getValue()).append(", ");
-        }
+        entrySet.forEach((entry) -> {
+            dummy.append(entry.getKey()).append(" = ").append(entry.getValue()).append(", ");
+        });
 
         // Deleting ', '
         dummy.delete(dummy.length() - 2, dummy.length());
         sql += dummy.toString();
 
-        if (!condition.equals(""))
-        {
+        if (!condition.equals("")) {
             sql += " WHERE " + condition;
         }
-        
+
         executeQuery(true, sql);
     }
 
@@ -207,8 +199,7 @@ public class DBSQLServer extends DBManager {
     @Override
     public void dropTable(String... tables) throws SQLException {
         String sql;
-        for (String table: tables)
-        {
+        for (String table : tables) {
             sql = "DROP TABLE " + table;
             executeQuery(true, sql);
         }
@@ -217,11 +208,10 @@ public class DBSQLServer extends DBManager {
     @Override
     public void dropDatabase(String... databases) throws SQLException {
         String sql;
-        for (String database: databases)
-        {
+        for (String database : databases) {
             sql = "DROP DATABASE " + database;
             executeQuery(true, sql);
         }
     }
-    
+
 }

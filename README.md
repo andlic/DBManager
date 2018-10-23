@@ -7,8 +7,8 @@ A library for Database Management that makes our development easier and a GUI th
 
 ## DBManager 1.x
 
-- [DBManagement Systems Supported](##compatibility)
-- [Examples](##creating-dbmanager-object)
+- [DBManagement Systems Supported](#compatibility)
+- [Examples](#creating-dbmanager-object)
 
 ## Compatibility
 
