@@ -1,3 +1,7 @@
+# Unstable Stuff
+bin/
+.gitignore
+
 # IDE Stuff
 .vscode/
 .settings
@@ -16,7 +20,3 @@ test/
 
 # Documentation
 docs/
-
-# Unstable Stuff
-bin/
-.gitignore
