@@ -20,12 +20,12 @@ public class DBMySQL extends DBManager {
     /**
      * Creates a connection with the parameters given.
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connecion.
-     * @param host The host where our Database is hosted.
-     * @param DBName The database name we want access to.
-     * @param port The port used for the connection.
-     * @param sslmode Declares if SSL is required.
+     * @param host     The host where our Database is hosted.
+     * @param DBName   The database name we want access to.
+     * @param port     The port used for the connection.
+     * @param sslmode  Declares if SSL is required.
      */
     public DBMySQL(String user, String password, String host, String DBName, int port, boolean sslmode) {
         super(user, password, host, DBName, DBType.MYSQL, port, sslmode);
@@ -34,9 +34,9 @@ public class DBMySQL extends DBManager {
     /**
      * Creates a connection based on a given <b>JDBC</b>.
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connection.
-     * @param JDBC The customized JDBC given.
+     * @param JDBC     The customized JDBC given.
      */
     public DBMySQL(String user, String password, String JDBC) {
         super(user, password, JDBC);
@@ -60,15 +60,15 @@ public class DBMySQL extends DBManager {
      * <li>ssl = non-required</li>
      * </ul>
      * It also creates the JDBC with the given parameters.<br>
-     * This methods requires {@code setDBName(String DBName)} for later
-     * connection to a Database.<br>
+     * This methods requires {@code setDBName(String DBName)} for later connection
+     * to a Database.<br>
      *
      * <pre>
      * DBMySQL conex = DBMySQL("username", "password");
      * conex.setDBName("sampleDatabase");
      * </pre>
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connection.
      */
     public DBMySQL(String user, String password) {
@@ -132,7 +132,7 @@ public class DBMySQL extends DBManager {
         // Creating sentence
         String sql = "INSERT INTO `" + table + "`(`"; // Getting case-sensitive by '`'
         sql += String.join("`, `", parsedInserts.keySet().toArray(new String[parsedInserts.keySet().size()])) + "`)";
-        sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
+        sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[] {})) + ")";
 
         executeQuery(true, sql);
     }

@@ -22,12 +22,12 @@ public class DBSQLServer extends DBManager {
     /**
      * Declares parameters used for a connection.
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connecion.
-     * @param host The host where our Database is hosted.
-     * @param DBName The database name we want access to.
-     * @param port The port used for the connection.
-     * @param sslmode Declares if SSL is required.
+     * @param host     The host where our Database is hosted.
+     * @param DBName   The database name we want access to.
+     * @param port     The port used for the connection.
+     * @param sslmode  Declares if SSL is required.
      */
     public DBSQLServer(String user, String password, String host, String DBName, int port, boolean sslmode) {
         super(user, password, host, DBName, DBType.SQLSERVER, port, sslmode);
@@ -38,9 +38,9 @@ public class DBSQLServer extends DBManager {
     /**
      * Creates a connection based on a given <b>JDBC</b>.
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connection.
-     * @param JDBC The customized JDBC given.
+     * @param JDBC     The customized JDBC given.
      */
     public DBSQLServer(String user, String password, String JDBC) {
         super(user, password, JDBC);
@@ -64,14 +64,15 @@ public class DBSQLServer extends DBManager {
      * <li>ssl = non-required</li>
      * </ul>
      * It also creates the JDBC with the given parameters.<br>
-     * This methods requires {@code setDBName(String DBName)} for later
-     * connection to a Database.<br>
+     * This methods requires {@code setDBName(String DBName)} for later connection
+     * to a Database.<br>
+     * 
      * <pre>
      * DBSQLServer conex = DBSQLServer("username", "password");
      * conex.setDBName("sampleDatabase");
      * </pre>
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connection.
      */
     public DBSQLServer(String user, String password) {
@@ -79,8 +80,7 @@ public class DBSQLServer extends DBManager {
     }
 
     @Override
-    protected void doConnect()
-            throws SQLException {
+    protected void doConnect() throws SQLException {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         } catch (ClassNotFoundException e) {
@@ -88,7 +88,7 @@ public class DBSQLServer extends DBManager {
         }
 
         if (JDBC.equals("")) {
-            JDBC = "jdbc:sqlserver://" + host + ":" + port + "/" + ";";
+            JDBC = "jdbc:sqlserver://" + host + ":" + port + ";";
             // If SSL is required JDBC will be updated.
             if (sslmode) {
                 properties.setProperty("integratedSecurity", "true");
@@ -120,8 +120,7 @@ public class DBSQLServer extends DBManager {
     }
 
     @Override
-    public void doInsert(String table, String... inserts)
-            throws SQLException {
+    public void doInsert(String table, String... inserts) throws SQLException {
         HashMap<String, String> parsedInserts = new HashMap<>();
 
         for (String insert : inserts) {
@@ -135,15 +134,14 @@ public class DBSQLServer extends DBManager {
 
         // Creating sentence
         String sql = "INSERT INTO " + table + "(";
-        sql += String.join(", ", parsedInserts.keySet().toArray(new String[]{})) + ")";
-        sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
+        sql += String.join(", ", parsedInserts.keySet().toArray(new String[] {})) + ")";
+        sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[] {})) + ")";
 
         executeQuery(true, sql);
     }
 
     @Override
-    public void doUpdate(String table, String condition, String... updates)
-            throws SQLException {
+    public void doUpdate(String table, String condition, String... updates) throws SQLException {
         // Our HashMap will store column and value
         HashMap<String, String> parsedUpdates = new HashMap<>();
 

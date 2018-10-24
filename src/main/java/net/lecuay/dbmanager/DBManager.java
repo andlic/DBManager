@@ -91,25 +91,23 @@ public abstract class DBManager {
      * </ul>
      */
     public enum DBType {
-        MYSQL,
-        POSTGRESQL,
-        SQLSERVER,
-        SQLITE3
+        MYSQL, POSTGRESQL, SQLSERVER, SQLITE3
     }
 
     // <editor-fold defaultstate="collapsed" desc="Constructors">
     /**
      * Declares parameters used for a connection.
      *
-     * @param user The user used for the connection.
-     * @param password The password used for the connecion.
-     * @param host The host where our Database is hosted.
-     * @param DBName The database name we want access to.
+     * @param user      The user used for the connection.
+     * @param password  The password used for the connecion.
+     * @param host      The host where our Database is hosted.
+     * @param DBName    The database name we want access to.
      * @param conexType The enum {@link DBType} declared for the connection.
-     * @param port The port used for the connection.
-     * @param sslmode Declares if SSL is required.
+     * @param port      The port used for the connection.
+     * @param sslmode   Declares if SSL is required.
      */
-    protected DBManager(String user, String password, String host, String DBName, DBType conexType, int port, boolean sslmode) {
+    protected DBManager(String user, String password, String host, String DBName, DBType conexType, int port,
+            boolean sslmode) {
         this.user = user;
         this.password = password;
         this.host = host;
@@ -125,9 +123,9 @@ public abstract class DBManager {
     /**
      * Creates a connection based on a given <b>JDBC</b>.
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connection.
-     * @param JDBC The customized JDBC given.
+     * @param JDBC     The customized JDBC given.
      */
     protected DBManager(String user, String password, String JDBC) {
         this.user = user;
@@ -150,7 +148,8 @@ public abstract class DBManager {
         host = uri.getHost();
         port = uri.getPort();
 
-        // getSchemeSpecificPart will return a full path, but we only need Database, which is
+        // getSchemeSpecificPart will return a full path, but we only need Database,
+        // which is
         // followed by host:port/
         DBName = uri.getSchemeSpecificPart().split(port + "/")[1];
 
@@ -178,13 +177,10 @@ public abstract class DBManager {
     /**
      * Closes connection itself and every object in params.
      *
-     * @param oCloseables Objects that implements
-     * {@link java.lang.AutoCloseable}.
-     * @throws SQLException In case {@link java.sql.Connection} couldn't be
-     * closed.
+     * @param oCloseables Objects that implements {@link java.lang.AutoCloseable}.
+     * @throws SQLException In case {@link java.sql.Connection} couldn't be closed.
      */
-    protected void doClose(AutoCloseable... oCloseables)
-            throws SQLException {
+    protected void doClose(AutoCloseable... oCloseables) throws SQLException {
         for (AutoCloseable closeable : oCloseables) {
             if (!(closeable instanceof java.lang.AutoCloseable)) {
                 throw new SQLException("The object " + closeable + " cannot be closed!");
@@ -200,29 +196,29 @@ public abstract class DBManager {
     }
 
     /**
-     * Executes either SQL code or a File SQL <i>(archive.sql)</i>
-     * and commits at the end.
+     * Executes either SQL code or a File SQL <i>(archive.sql)</i> and commits at
+     * the end.
      *
      * @param sql SQL code or path to the File SQL.
      * @throws FileNotFoundException If file cannot be accessed.
-     * @throws SQLException If SQL syntax error or Connection error is raised.
+     * @throws SQLException          If SQL syntax error or Connection error is
+     *                               raised.
      */
-    public void doExecute(String sql)
-            throws FileNotFoundException, SQLException {
+    public void doExecute(String sql) throws FileNotFoundException, SQLException {
         doExecute(sql, true);
     }
 
     /**
-     * Executes either SQL code or a File SQL <i>(archive.sql)</i>
-     * and commits if is needed.
+     * Executes either SQL code or a File SQL <i>(archive.sql)</i> and commits if is
+     * needed.
      *
-     * @param sql SQL code or path to the File SQL.
+     * @param sql    SQL code or path to the File SQL.
      * @param commit {@code true} for committing, {@code false} otherwise.
      * @throws FileNotFoundException If file cannot be accessed.
-     * @throws SQLException If SQL syntax error or Connection error is raised.
+     * @throws SQLException          If SQL syntax error or Connection error is
+     *                               raised.
      */
-    public void doExecute(String sql, boolean commit)
-            throws FileNotFoundException, SQLException {
+    public void doExecute(String sql, boolean commit) throws FileNotFoundException, SQLException {
         File file = new File(sql);
         // Check if SQL exists and is a file
         if (file.exists() && file.isFile()) {
@@ -233,9 +229,8 @@ public abstract class DBManager {
     }
 
     /**
-     * Executes either SQL code or a File SQL <i>(archive.sql)</i>
-     * and returns result as
-     * {@code ArrayList<LinkedHashMap<String, String>>}.<br>
+     * Executes either SQL code or a File SQL <i>(archive.sql)</i> and returns
+     * result as {@code ArrayList<LinkedHashMap<String, String>>}.<br>
      *
      * <b>Example of use:</b><br>
      * <i>Assuming we have the following table 'users':</i>
@@ -265,23 +260,24 @@ public abstract class DBManager {
      * // We already have an object DBManager connection.
      * String sql = "SELECT name FROM users; SELECT COUNT(id) FROM users;";
      * connection.doExecuteWithReturn(sql).forEach(query -&gt; {
-     *  // The first one will be the select with name
-     *  // The second one will be the count of id
+     *     // The first one will be the select with name
+     *     // The second one will be the count of id
      *
-     *  query.forEach(entry -&gt; {
-     *      // Now we read every entry got by our select
-     *      System.out.println(entry);
-     *  });
+     *     query.forEach(entry -&gt; {
+     *         // Now we read every entry got by our select
+     *         System.out.println(entry);
+     *     });
      * });
      * </pre>
      *
      * @param sql SQL code or path to the File SQL.
-     * @return An array with every {@link java.util.ArrayList} with each entry
-     * in our table. Also each {@link java.util.ArrayList} has a
-     * {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and
-     * <i>Value of column</i> as {@code Value}.
+     * @return An array with every {@link java.util.ArrayList} with each entry in
+     *         our table. Also each {@link java.util.ArrayList} has a
+     *         {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and
+     *         <i>Value of column</i> as {@code Value}.
      * @throws FileNotFoundException If file cannot be accessed.
-     * @throws SQLException If SQL syntax error or Connection error is raised.
+     * @throws SQLException          If SQL syntax error or Connection error is
+     *                               raised.
      *
      * @see DBManager#executeQueryWithReturn(String...)
      */
@@ -300,12 +296,11 @@ public abstract class DBManager {
      * Executes a SQL file query-by-query.
      *
      * @param fileSQL The SQL file to execute.
-     * @param commit {@code true} for committing, {@code false} otherwise.
+     * @param commit  {@code true} for committing, {@code false} otherwise.
      * @throws FileNotFoundException In case file cannot be found.
-     * @throws SQLException If SQL syntax error or connection error raises.
+     * @throws SQLException          If SQL syntax error or connection error raises.
      */
-    protected void executeFile(File fileSQL, boolean commit)
-            throws FileNotFoundException, SQLException {
+    protected void executeFile(File fileSQL, boolean commit) throws FileNotFoundException, SQLException {
         String sql = "";
         // Using try-with-resources we avoid 'reader.close()'
         try (Scanner reader = new Scanner(fileSQL)) {
@@ -325,7 +320,7 @@ public abstract class DBManager {
      * @param fileSQL The SQL file to execute.
      * @return An array with the result format.
      * @throws FileNotFoundException In case file cannot be found.
-     * @throws SQLException If SQL syntax error or connection error raises.
+     * @throws SQLException          If SQL syntax error or connection error raises.
      *
      * @see DBManager#executeQueryWithReturn(String...)
      */
@@ -346,12 +341,11 @@ public abstract class DBManager {
     /**
      * Executes SQL code and commits if needed.
      *
-     * @param commit {@code true} for committing, {@code false} otherwise.
+     * @param commit  {@code true} for committing, {@code false} otherwise.
      * @param codeSQL Array of SQL code to execute.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
-    protected void executeQuery(boolean commit, String... codeSQL)
-            throws SQLException {
+    protected void executeQuery(boolean commit, String... codeSQL) throws SQLException {
         doConnect();
         Statement stm = connection.createStatement();
 
@@ -379,10 +373,10 @@ public abstract class DBManager {
      * Executes SQL code and returns result as {@code ArrayList<LinkedHasMap>}.
      *
      * @param codeSQL Array of SQL code to execute.
-     * @return An array with every {@link java.util.ArrayList} with each entry
-     * in our table. Also each {@link java.util.ArrayList} has a
-     * {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and
-     * <i>Value of column</i> as {@code Value}.
+     * @return An array with every {@link java.util.ArrayList} with each entry in
+     *         our table. Also each {@link java.util.ArrayList} has a
+     *         {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and
+     *         <i>Value of column</i> as {@code Value}.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
     protected ArrayList<ArrayList<LinkedHashMap<String, String>>> executeQueryWithReturn(String... codeSQL)
@@ -400,8 +394,10 @@ public abstract class DBManager {
             while (result.next()) {
                 selectResult.get(i).add(new LinkedHashMap<>());
                 for (int j = 0; j < result.getMetaData().getColumnCount(); j++) {
-                    // selectResult.get(i).get(selectResult.get(i).size() - 1) will get the very last item
-                    selectResult.get(i).get(selectResult.get(i).size() - 1).put(result.getMetaData().getColumnName(j + 1), result.getString(j + 1));
+                    // selectResult.get(i).get(selectResult.get(i).size() - 1) will get the very
+                    // last item
+                    selectResult.get(i).get(selectResult.get(i).size() - 1)
+                            .put(result.getMetaData().getColumnName(j + 1), result.getString(j + 1));
                 }
             }
 
@@ -418,39 +414,39 @@ public abstract class DBManager {
      * example:<br>
      *
      * <b>Assuming that we have 3 entries in our table <i>sample</i> with the
-     * following columns: <i>id</i>, <i>name</i>, <i>country</i> we must
-     * use:</b>
+     * following columns: <i>id</i>, <i>name</i>, <i>country</i> we must use:</b>
      *
      * <pre>
      * // Create object connection
      * {@literal ArrayList<LinkedHashMap<String, String>>} select;
      * select = connection.doSelect("sample", "", "id", "name", "country");
-     * </pre> Our <i>select</i> object now is filled with 3
-     * {@link java.util.Map}, each map has
-     * <i>id</i>, <i>name</i>, <i>country</i> as {@code Keys} and its respective
+     * </pre>
+     * 
+     * Our <i>select</i> object now is filled with 3 {@link java.util.Map}, each map
+     * has <i>id</i>, <i>name</i>, <i>country</i> as {@code Keys} and its respective
      * values.
      *
-     * @param table The table we want to select from.
+     * @param table     The table we want to select from.
      * @param condition The condition if its needed (otherwise just "").
-     * @param columns The columns we want to select.
+     * @param columns   The columns we want to select.
      * @return An {@link java.util.ArrayList} with each entry in our table. Also
-     * each {@link java.util.ArrayList} has a {@link java.util.LinkedHashMap}
-     * with <i>Column</i> as {@code Key} and <i>Value of column</i> as
-     * {@code Value}.
+     *         each {@link java.util.ArrayList} has a
+     *         {@link java.util.LinkedHashMap} with <i>Column</i> as {@code Key} and
+     *         <i>Value of column</i> as {@code Value}.
      * @throws SQLException In case SQL syntax error or Connection error.
      */
-    public abstract ArrayList<LinkedHashMap<String, String>> doSelect(String table, String condition, String... columns) throws SQLException;
+    public abstract ArrayList<LinkedHashMap<String, String>> doSelect(String table, String condition, String... columns)
+            throws SQLException;
 
     /**
      * It prints our select.
      *
-     * @param table The table we want to select from.
+     * @param table     The table we want to select from.
      * @param condition The condition if its needed (otherwise just "").
-     * @param columns The columns we want to select.
+     * @param columns   The columns we want to select.
      * @throws SQLException In case SQL syntax error or Connection error.
      */
-    public void showSelect(String table, String condition, String... columns)
-            throws SQLException {
+    public void showSelect(String table, String condition, String... columns) throws SQLException {
         ArrayList<LinkedHashMap<String, String>> resultSelect = doSelect(table, condition, columns);
         // Getting literally any entry to get columns size
         try {
@@ -469,19 +465,20 @@ public abstract class DBManager {
     /**
      * Does a insert into a table.<br>
      * Parameters must follow the next syntax {@code columnName=value}.<br>
-     * For example, assuming that we want to insert <i>name</i>, <i>coins</i>
-     * and <i>id</i> into
-     * <i>sample</i> table we have to use the following lines:
+     * For example, assuming that we want to insert <i>name</i>, <i>coins</i> and
+     * <i>id</i> into <i>sample</i> table we have to use the following lines:
+     * 
      * <pre>
      * // DBManager instace connection
      * connection.doInsert("sample", "name='LeCuay'", "coins=12.5", "id=12")
      * </pre>
-     * <b>Is very important to follow the correct syntax: values between
-     * <i>''</i> for Strings and plain for numbers.</b>
+     * 
+     * <b>Is very important to follow the correct syntax: values between <i>''</i>
+     * for Strings and plain for numbers.</b>
      *
-     * @param table The table where values will be inserted.
+     * @param table   The table where values will be inserted.
      * @param inserts The values to insert following the syntax:
-     * {@code column=value}.
+     *                {@code column=value}.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
     public abstract void doInsert(String table, String... inserts) throws SQLException;
@@ -489,19 +486,21 @@ public abstract class DBManager {
     /**
      * Does an update into row or rows.<br>
      * Parameters must follow the next syntax {@code columnName=newValue}.<br>
-     * For example, assuming we want to change every <i>name</i> value starting
-     * by "Jr." for "Mr." we will use the following code:
+     * For example, assuming we want to change every <i>name</i> value starting by
+     * "Jr." for "Mr." we will use the following code:
+     * 
      * <pre>
      * // DBManager instance connection
      * connection.doUpdate("sample", "name LIKE 'Jr.%'", "name='Mr. ' + name");
      * </pre>
-     * <b>Is very important to follow the correct syntax: values between
-     * <i>''</i> for Strings and plain for numbers.</b>
+     * 
+     * <b>Is very important to follow the correct syntax: values between <i>''</i>
+     * for Strings and plain for numbers.</b>
      *
-     * @param table The Table where values will be updated.
+     * @param table     The Table where values will be updated.
      * @param condition The condition for updating rows.
-     * @param updates The values to update following the syntax:
-     * {@code column=newValue}.
+     * @param updates   The values to update following the syntax:
+     *                  {@code column=newValue}.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
     public abstract void doUpdate(String table, String condition, String... updates) throws SQLException;
@@ -509,7 +508,7 @@ public abstract class DBManager {
     /**
      * Deletes a row or rows where condition is true.
      *
-     * @param table The table we want to remove the rows.
+     * @param table     The table we want to remove the rows.
      * @param condition The condition for the rows to be deleted.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
@@ -519,20 +518,19 @@ public abstract class DBManager {
      * Creates a table with the columns given in paramaters.<br>
      * Parameters must follow the next syntax {@code columnName Type Value}.<br>
      * For exaple, assuming we want to create the table 'persons' with <i>id
-     * (integer primary key)</i>,
-     * <i>name (varchar(255))</i> and <i>age (integer(4))</i> we will use the
-     * follow code:
+     * (integer primary key)</i>, <i>name (varchar(255))</i> and <i>age
+     * (integer(4))</i> we will use the follow code:
+     * 
      * <pre>
      * // DBManager instance connection
-     * connection.createTable("persons", "id INTEGER PRIMARY KEY",
-     *                              "name VARCHAR(255)",
-     *                              "age INTEGER(4)");
+     * connection.createTable("persons", "id INTEGER PRIMARY KEY", "name VARCHAR(255)", "age INTEGER(4)");
      * </pre>
+     * 
      * <b>Keep in mind each SQL Connection has its own syntax.</b>
      *
-     * @param table Name of the table we want to create.
+     * @param table   Name of the table we want to create.
      * @param columns The columns to create following the syntax:
-     * {@code colunmName Type Value}.
+     *                {@code colunmName Type Value}.
      * @throws SQLException If SQL syntax error or connection error raises.
      */
     public abstract void createTable(String table, String... columns) throws SQLException;
@@ -563,7 +561,8 @@ public abstract class DBManager {
 
     // <editor-fold defaultstate="collapsed" desc="Setter and Getters">
     /*
-    ** ---- Every time we reset something by setValue() method JDBC must be reseted ---- **
+     ** ---- Every time we reset something by setValue() method JDBC must be reseted
+     * ---- **
      */
     /**
      * Changes the user used in the Database connection.
@@ -605,6 +604,16 @@ public abstract class DBManager {
     }
 
     /**
+     * Changes the host.
+     * 
+     * @param host The new host to connect
+     */
+    public void setHost(String host) {
+        JDBC = "";
+        this.host = host;
+    }
+
+    /**
      * Changes the port used for the connection.
      *
      * @param port The new port.
@@ -627,7 +636,7 @@ public abstract class DBManager {
     /**
      * Adds a property to the JDBC.
      *
-     * @param key The key of the property.
+     * @param key   The key of the property.
      * @param value The value of the property.
      */
     public void addProperty(String key, String value) {
@@ -640,8 +649,7 @@ public abstract class DBManager {
      * @return An array with all the schemas.
      * @throws SQLException If connection fails.
      */
-    public String[] getDatabases()
-            throws SQLException {
+    public String[] getDatabases() throws SQLException {
         doConnect();
 
         ArrayList<String> databases = new ArrayList<>();
@@ -652,7 +660,7 @@ public abstract class DBManager {
         }
 
         doClose();
-        return databases.toArray(new String[]{});
+        return databases.toArray(new String[] {});
     }
 
     /**
@@ -661,8 +669,7 @@ public abstract class DBManager {
      * @return An array with tables in that database
      * @throws SQLException If connection fails.
      */
-    public String[] getTables()
-            throws SQLException {
+    public String[] getTables() throws SQLException {
         doConnect();
 
         ArrayList<String> tables = new ArrayList<>();
@@ -685,7 +692,7 @@ public abstract class DBManager {
         }
 
         doClose(result);
-        return tables.toArray(new String[]{});
+        return tables.toArray(new String[] {});
     }
 
     /**
@@ -695,8 +702,7 @@ public abstract class DBManager {
      * @return An array with all columns within a Table.
      * @throws SQLException If connection fails.
      */
-    public String[] getColumns(String table)
-            throws SQLException {
+    public String[] getColumns(String table) throws SQLException {
         doConnect();
 
         ArrayList<String> columns = new ArrayList<>();
@@ -716,7 +722,7 @@ public abstract class DBManager {
         }
 
         doClose();
-        return columns.toArray(new String[]{});
+        return columns.toArray(new String[] {});
     }
 
     /**
@@ -726,8 +732,7 @@ public abstract class DBManager {
      * @return An array with all columns and detailed information.
      * @throws SQLException If connection fails.
      */
-    public String[] getColumnsInfo(String table)
-            throws SQLException {
+    public String[] getColumnsInfo(String table) throws SQLException {
         doConnect();
 
         ResultSet result, rstPrimaryKeys;
@@ -748,17 +753,14 @@ public abstract class DBManager {
         }
 
         while (result.next()) {
-            columnInfo.add(String.format("%s %s(%s%s)%s%s",
-                    result.getString(4),
-                    result.getString(6),
-                    result.getString(7),
-                    result.getString(9) != null ? ", " + result.getString(9) : "",
+            columnInfo.add(String.format("%s %s(%s%s)%s%s", result.getString(4), result.getString(6),
+                    result.getString(7), result.getString(9) != null ? ", " + result.getString(9) : "",
                     primaryKeys.contains(result.getString(4)) ? " PRIMARY KEY" : "",
                     result.getString(11).equals("0") ? " NOT NULL" : ""));
         }
 
         doClose(result, rstPrimaryKeys);
-        return columnInfo.toArray(new String[]{});
+        return columnInfo.toArray(new String[] {});
     }
 
     /**
@@ -789,8 +791,7 @@ public abstract class DBManager {
     }
 
     /**
-     * Returns the name of the enum {@link DBType} used in the actual
-     * connection.
+     * Returns the name of the enum {@link DBType} used in the actual connection.
      *
      * @return {@link DBType} as {@link java.lang.String}.
      */
@@ -818,17 +819,10 @@ public abstract class DBManager {
 
     @Override
     public String toString() {
-        return String.format("- - - - - DBManager %s - - - - -\n"
-                + "Connection type: %s\n"
-                + "User: %s\n"
-                + "Host: %s\n"
-                + "Schema: %s\n"
-                + "Port: %d\n"
-                + "SSLMode: %s\n"
-                + "- - - - - Created by %s - - - - -",
-                DBManager.version, conexType.name(),
-                user, host, DBName, port, sslmode,
-                DBManager.author);
+        return String.format(
+                "- - - - - DBManager %s - - - - -\n" + "Connection type: %s\n" + "User: %s\n" + "Host: %s\n"
+                        + "Schema: %s\n" + "Port: %d\n" + "SSLMode: %s\n" + "- - - - - Created by %s - - - - -",
+                DBManager.version, conexType.name(), user, host, DBName, port, sslmode, DBManager.author);
     }
 
     // </editor-fold>

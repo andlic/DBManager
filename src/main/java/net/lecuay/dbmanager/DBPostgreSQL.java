@@ -23,12 +23,12 @@ public class DBPostgreSQL extends DBManager {
     /**
      * Creates a connection with the parameters given.
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connecion.
-     * @param host The host where our Database is hosted.
-     * @param DBName The database name we want access to.
-     * @param port The port used for the connection.
-     * @param sslmode Declares if SSL is required.
+     * @param host     The host where our Database is hosted.
+     * @param DBName   The database name we want access to.
+     * @param port     The port used for the connection.
+     * @param sslmode  Declares if SSL is required.
      */
     public DBPostgreSQL(String user, String password, String host, String DBName, int port, boolean sslmode) {
         super(user, password, host, DBName, DBType.MYSQL, port, sslmode);
@@ -37,9 +37,9 @@ public class DBPostgreSQL extends DBManager {
     /**
      * Creates a connection based on a given <b>JDBC</b>.
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connection.
-     * @param JDBC The customized JDBC given.
+     * @param JDBC     The customized JDBC given.
      */
     public DBPostgreSQL(String user, String password, String JDBC) {
         super(user, password, JDBC);
@@ -63,14 +63,15 @@ public class DBPostgreSQL extends DBManager {
      * <li>ssl = non-required</li>
      * </ul>
      * It also creates the JDBC with the given parameters.<br>
-     * This methods requires {@code setDBName(String DBName)} for later
-     * connection to a Database.<br>
+     * This methods requires {@code setDBName(String DBName)} for later connection
+     * to a Database.<br>
+     * 
      * <pre>
      * DBPostgreSQL conex = DBPostgreSQL("username", "password");
      * conex.setDBName("sampleDatabase");
      * </pre>
      *
-     * @param user The user used for the connection.
+     * @param user     The user used for the connection.
      * @param password The password used for the connection.
      */
     public DBPostgreSQL(String user, String password) {
@@ -78,8 +79,7 @@ public class DBPostgreSQL extends DBManager {
     }
 
     @Override
-    protected void doConnect()
-            throws SQLException {
+    protected void doConnect() throws SQLException {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
@@ -116,8 +116,7 @@ public class DBPostgreSQL extends DBManager {
     }
 
     @Override
-    public void doInsert(String table, String... inserts)
-            throws SQLException {
+    public void doInsert(String table, String... inserts) throws SQLException {
         HashMap<String, String> parsedInserts = new HashMap<>();
 
         for (String insert : inserts) {
@@ -130,16 +129,15 @@ public class DBPostgreSQL extends DBManager {
         }
 
         // Creating sentence
-        String sql = "INSERT INTO \"" + table + "\"(\"";  // Also we need to get case-sensitive so we use '"'
-        sql += String.join("\", \"", parsedInserts.keySet().toArray(new String[]{})) + "\")";
-        sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[]{})) + ")";
+        String sql = "INSERT INTO \"" + table + "\"(\""; // Also we need to get case-sensitive so we use '"'
+        sql += String.join("\", \"", parsedInserts.keySet().toArray(new String[] {})) + "\")";
+        sql += " VALUES (" + String.join(", ", parsedInserts.values().toArray(new String[] {})) + ")";
 
         executeQuery(true, sql);
     }
 
     @Override
-    public void doUpdate(String table, String condition, String... updates)
-            throws SQLException {
+    public void doUpdate(String table, String condition, String... updates) throws SQLException {
         // Our HashMap will store column and value
         HashMap<String, String> parsedUpdates = new HashMap<>();
 
@@ -208,8 +206,7 @@ public class DBPostgreSQL extends DBManager {
     }
 
     @Override
-    public String[] getColumnsInfo(String table)
-            throws SQLException {
+    public String[] getColumnsInfo(String table) throws SQLException {
         doConnect();
 
         ResultSet result;
@@ -223,25 +220,21 @@ public class DBPostgreSQL extends DBManager {
             result = connection.getMetaData().getColumns(DBName, null, "%" + table + "%", null);
         }
 
-        executeQueryWithReturn("select column_name, constraint_name "
-                + "from information_schema.key_column_usage "
-                + "where table_catalog='aed' and table_name='clientes_premium';").get(0)
-                .forEach(entry -> {
+        executeQueryWithReturn("select column_name, constraint_name " + "from information_schema.key_column_usage "
+                + "where table_catalog='aed' and table_name='clientes_premium';").get(0).forEach(entry -> {
                     primaryKeys.add(entry.get("column_name"));
                 });
 
         while (result.next()) {
-            columnInfo.add(String.format("%s %s(%s%s)%s%s",
-                    result.getString(4),
-                    result.getString(6).contains("bpchar") ? "character" : result.getString(6),
-                    result.getString(7),
+            columnInfo.add(String.format("%s %s(%s%s)%s%s", result.getString(4),
+                    result.getString(6).contains("bpchar") ? "character" : result.getString(6), result.getString(7),
                     result.getString(9) != null ? ", " + result.getString(9) : "",
                     primaryKeys.contains(result.getString(4)) ? " PRIMARY KEY" : "",
                     result.getString(11).equals("0") ? " NOT NULL" : ""));
         }
 
         doClose(result);
-        return columnInfo.toArray(new String[]{});
+        return columnInfo.toArray(new String[] {});
     }
 
 }
