@@ -1,0 +1,15 @@
+# IDEs
+.idea/
+.settings/
+.vscode/
+.project
+.classpath
+DBManager.iml
+dependency-reduced-pom.xml
+
+# Test
+test/
+target/
+
+# Docs
+docs/
