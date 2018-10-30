@@ -60,7 +60,7 @@ public class Encryption {
      * @param str  The value to compare to.
      * @return {@code True} if value equals SHA1 encryption, {@code False} otherwise.
      */
-    public boolean compareSHA1(String sha1, String str) {
+    public static boolean compareSHA1(String sha1, String str) {
         return encryptSHA1(str).equals(sha1);
     }
 
@@ -71,7 +71,7 @@ public class Encryption {
      * @param str The value to compare to.
      * @return {@code True} if value equals MD% encryption, {@code False} otherwise.
      */
-    public boolean compareMD5(String md5, String str) {
+    public static boolean compareMD5(String md5, String str) {
         return encryptMD5(str).equals(md5);
     }
 
