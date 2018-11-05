@@ -1,0 +1,16 @@
+# IDE Stuff
+.env/
+.idea/
+.settings/
+.vscode/
+.classpath
+.project
+*.iml
+*pom.xml
+
+# Docs
+docs/
+
+# Compiled stuff
+test/
+target/
