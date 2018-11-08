@@ -1,13 +1,15 @@
-# IDE Stuff
+# IDEs
+.idea/
+.settings/
 .vscode/
-.settings
-.class
-.classpath
 .project
-*pom.xml
+.classpath
+DBManager.iml
+dependency-reduced-pom.xml
+pom.xml
 
-# Compiled stuff
-*.class
+# Test
+test/
 target/
 
 # Test
