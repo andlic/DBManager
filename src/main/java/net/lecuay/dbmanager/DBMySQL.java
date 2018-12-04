@@ -1,6 +1,7 @@
 package net.lecuay.dbmanager;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,7 +14,8 @@ import java.util.Set;
  * Class created as instance of {@link DBManager} to manage MySQL connections.
  *
  * @author LeCuay
- * @version 0.1 - Beta
+ * @version 0.7.1
+ * @see DBManager
  */
 public class DBMySQL extends DBManager {
 
@@ -37,8 +39,9 @@ public class DBMySQL extends DBManager {
      * @param user     The user used for the connection.
      * @param password The password used for the connection.
      * @param JDBC     The customized JDBC given.
+     * @throws URISyntaxException
      */
-    public DBMySQL(String user, String password, String JDBC) {
+    public DBMySQL(String user, String password, String JDBC) throws URISyntaxException {
         super(user, password, JDBC);
     }
 
@@ -80,7 +83,7 @@ public class DBMySQL extends DBManager {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("Driver not found! -> " + e.getMessage());
+            throw new SQLException("Driver not found! -> " + e.getMessage());
         }
 
         if (JDBC.equals("")) {
@@ -180,30 +183,36 @@ public class DBMySQL extends DBManager {
 
     @Override
     public void createTable(String table, String... columns) throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS `" + table + "` (";
-        sql += String.join(", ", columns) + ")";
-        executeQuery(true, sql);
+        String codeSQL = "CREATE TABLE IF NOT EXISTS `" + table + "` (";
+        codeSQL += String.join(", ", columns) + ")";
+        executeQuery(true, codeSQL);
     }
 
     @Override
     public void createDatabase(String database) throws SQLException {
-        String sql = "CREATE DATABASE IF NOT EXISTS `" + database + "`";
-        executeQuery(true, sql);
+        String codeSQL = "CREATE DATABASE IF NOT EXISTS `" + database + "`";
+        executeQuery(true, codeSQL);
     }
 
     @Override
     public void dropTable(String... tables) throws SQLException {
-        String sql = "DROP TABLE IF EXISTS `" + String.join("`, `", tables) + "`";
-        executeQuery(true, sql);
+        String codeSQL = "DROP TABLE IF EXISTS `" + String.join("`, `", tables) + "`";
+        executeQuery(true, codeSQL);
     }
 
     @Override
     public void dropDatabase(String... databases) throws SQLException {
-        String sql;
+        String codeSQL;
         for (String db : databases) {
-            sql = "DROP DATABASE IF EXISTS `" + db + "`";
-            executeQuery(true, sql);
+            codeSQL = "DROP DATABASE IF EXISTS `" + db + "`";
+            executeQuery(true, codeSQL);
         }
+    }
+
+    @Override
+    public void addColumn(String table, String columnName, String columnDefinition) throws SQLException {
+        String codeSQL = "ALTER TABLE `" + table + "` ADD COLUMN `" + columnName + "` " + columnDefinition;
+        executeQuery(true, codeSQL);
     }
 
 }

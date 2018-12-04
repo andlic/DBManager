@@ -1,6 +1,7 @@
 package net.lecuay.dbmanager;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +16,7 @@ import java.util.Set;
  * connections.
  *
  * @author LeCuay
- * @version 0.1 - Beta
+ * @version 0.7.1
  * @see DBManager
  */
 public class DBPostgreSQL extends DBManager {
@@ -40,8 +41,9 @@ public class DBPostgreSQL extends DBManager {
      * @param user     The user used for the connection.
      * @param password The password used for the connection.
      * @param JDBC     The customized JDBC given.
+     * @throws URISyntaxException
      */
-    public DBPostgreSQL(String user, String password, String JDBC) {
+    public DBPostgreSQL(String user, String password, String JDBC) throws URISyntaxException {
         super(user, password, JDBC);
     }
 
@@ -235,6 +237,12 @@ public class DBPostgreSQL extends DBManager {
 
         doClose(result);
         return columnInfo.toArray(new String[] {});
+    }
+
+    @Override
+    public void addColumn(String table, String columnName, String columnDefinition) throws SQLException {
+        String codeSQL = String.format("ALTER TABLE \"%s\" ADD COLUMN \"%s\" %s", table, columnName, columnDefinition);
+        executeQuery(true, codeSQL);
     }
 
 }

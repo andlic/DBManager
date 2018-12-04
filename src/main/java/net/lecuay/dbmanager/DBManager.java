@@ -2,6 +2,8 @@ package net.lecuay.dbmanager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +18,7 @@ import java.util.Scanner;
  * managing.
  *
  * @author LeCuay
- * @version 0.1 - Beta
+ * @version 0.7.1
  */
 public abstract class DBManager {
 
@@ -28,7 +30,7 @@ public abstract class DBManager {
     /**
      * The version of the API
      */
-    private static String version = "0.1 - Beta";
+    private static String version = "0.7.1";
 
     /**
      * The user used in the connection.
@@ -121,16 +123,32 @@ public abstract class DBManager {
     }
 
     /**
-     * Creates a connection based on a given <b>JDBC</b>.
+     * Creates a connection based on a given <b>JDBC</b>.<br>
+     * <i>This constructor does not recognize if SSLMode is declared.</i><br>
+     * Please use {@link #setSSLMode(boolean)}.
      *
      * @param user     The user used for the connection.
      * @param password The password used for the connection.
      * @param JDBC     The customized JDBC given.
+     * @throws URISyntaxException In case JDBC is not correct.
      */
-    protected DBManager(String user, String password, String JDBC) {
+    protected DBManager(String user, String password, String JDBC) throws URISyntaxException {
         this.user = user;
         this.password = password;
         this.JDBC = JDBC;
+
+        String toRemove = "jdbc:";
+        // Checking if URI has '?Property=Value' syntax
+        int endPoint = JDBC.indexOf("?") == -1 ? JDBC.length() : JDBC.indexOf("?");
+        // JDBC should be something starting by 'jdbc:'
+        // 'jdbc:' will be removed
+        URI URIJDBC = new URI(JDBC.substring(JDBC.indexOf(toRemove) + toRemove.length(), endPoint));
+        host = URIJDBC.getHost();
+        port = URIJDBC.getPort();
+        // getSchemeSpecificPart will return a full path, but we only need Database,
+        // which is
+        // followed by host:port/
+        DBName = URIJDBC.getSchemeSpecificPart().split(port + "/")[1];
 
         properties.setProperty("user", user);
         properties.setProperty("password", password);
@@ -139,9 +157,9 @@ public abstract class DBManager {
     /**
      * Creates a connection based on a given URI.
      *
-     * @param uri The object {@link java.net.URI} used for the connection.
+     * @param uri The object {@link URI} used for the connection.
      */
-    protected DBManager(java.net.URI uri) {
+    protected DBManager(URI uri) {
         // Since UserInfo works by user:password we are getting each
         user = uri.getUserInfo().split(":")[0];
         password = uri.getUserInfo().split(":")[1];
@@ -158,6 +176,7 @@ public abstract class DBManager {
     }
 
     // </editor-fold>
+
     /**
      * This method will make a connection for our Database.
      *
@@ -559,89 +578,16 @@ public abstract class DBManager {
      */
     public abstract void dropDatabase(String... databases) throws SQLException;
 
-    // <editor-fold defaultstate="collapsed" desc="Setter and Getters">
-    /*
-     ** ---- Every time we reset something by setValue() method JDBC must be reseted
-     * ---- **
-     */
     /**
-     * Changes the user used in the Database connection.
-     *
-     * @param user The new user.
-     */
-    public void setUser(String user) {
-        JDBC = "";
-        this.user = user;
-    }
-
-    /**
-     * Changes the password used for the connection.
-     *
-     * @param password The new password.
-     */
-    public void setPassword(String password) {
-        JDBC = "";
-        this.password = password;
-    }
-
-    /**
-     * Changes the Database we want connect to.
-     *
-     * @param DBName The new Database.
-     */
-    public void setDBName(String DBName) {
-        JDBC = "";
-        this.DBName = DBName;
-    }
-
-    /**
-     * Changes the enum {@link DBType} used for the connection.
-     *
-     * @param conexType The new {@link DBType}.
-     */
-    public void setConexType(DBType conexType) {
-        this.conexType = conexType;
-    }
-
-    /**
-     * Changes the host.
+     * Adds a column to a table.
      * 
-     * @param host The new host to connect
+     * @param table            The table to modify.
+     * @param columnName       The name of the column we want to add.
+     * @param columnDefinition The column definition for its creation.<br>
+     *                         Example: "VARCHAR(150) UNIQUE NOT NULL"
+     * @throws SQLException If SQL syntax error or connection error raises.
      */
-    public void setHost(String host) {
-        JDBC = "";
-        this.host = host;
-    }
-
-    /**
-     * Changes the port used for the connection.
-     *
-     * @param port The new port.
-     */
-    public void setPort(int port) {
-        JDBC = "";
-        this.port = port;
-    }
-
-    /**
-     * Sets if SSL is required.
-     *
-     * @param sslmode {@code True} if is required {@code False} otherwise.
-     */
-    public void setSSLMode(boolean sslmode) {
-        JDBC = "";
-        this.sslmode = sslmode;
-    }
-
-    /**
-     * Adds a property to the JDBC.
-     *
-     * @param key   The key of the property.
-     * @param value The value of the property.
-     */
-    public void addProperty(String key, String value) {
-        properties.setProperty(key, value);
-    }
+    public abstract void addColumn(String table, String columnName, String columnDefinition) throws SQLException;
 
     /**
      * Gets every schema within a connection and returns them as an Array.
@@ -763,6 +709,90 @@ public abstract class DBManager {
         return columnInfo.toArray(new String[] {});
     }
 
+    // <editor-fold defaultstate="collapsed" desc="Setter and Getters">
+    /*
+     ** ---- Every time we reset something by setValue() method JDBC must be reseted
+     * ---- **
+     */
+    /**
+     * Changes the user used in the Database connection.
+     *
+     * @param user The new user.
+     */
+    public void setUser(String user) {
+        JDBC = "";
+        this.user = user;
+    }
+
+    /**
+     * Changes the password used for the connection.
+     *
+     * @param password The new password.
+     */
+    public void setPassword(String password) {
+        JDBC = "";
+        this.password = password;
+    }
+
+    /**
+     * Changes the Database we want connect to.
+     *
+     * @param DBName The new Database.
+     */
+    public void setDBName(String DBName) {
+        JDBC = "";
+        this.DBName = DBName;
+    }
+
+    /**
+     * Changes the enum {@link DBType} used for the connection.
+     *
+     * @param conexType The new {@link DBType}.
+     */
+    public void setConexType(DBType conexType) {
+        this.conexType = conexType;
+    }
+
+    /**
+     * Changes the host.
+     * 
+     * @param host The new host to connect
+     */
+    public void setHost(String host) {
+        JDBC = "";
+        this.host = host;
+    }
+
+    /**
+     * Changes the port used for the connection.
+     *
+     * @param port The new port.
+     */
+    public void setPort(int port) {
+        JDBC = "";
+        this.port = port;
+    }
+
+    /**
+     * Sets if SSL is required.
+     *
+     * @param sslmode {@code True} if is required {@code False} otherwise.
+     */
+    public void setSSLMode(boolean sslmode) {
+        JDBC = "";
+        this.sslmode = sslmode;
+    }
+
+    /**
+     * Adds a property to the JDBC.
+     *
+     * @param key   The key of the property.
+     * @param value The value of the property.
+     */
+    public void addProperty(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
     /**
      * Returns the user used for the connection.
      *
@@ -806,6 +836,15 @@ public abstract class DBManager {
      */
     public int getPort() {
         return this.port;
+    }
+
+    /**
+     * Returns the host used.
+     * 
+     * @return The host used as String.
+     */
+    public String getHost() {
+        return this.host;
     }
 
     /**
