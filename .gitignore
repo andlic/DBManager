@@ -3,6 +3,7 @@
 .idea/
 .settings/
 .vscode/
+*-workspace
 .classpath
 .project
 *.iml
@@ -12,5 +13,4 @@
 docs/
 
 # Compiled stuff
-test/
 target/
