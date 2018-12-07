@@ -133,6 +133,9 @@ public abstract class DBManager {
      * @throws URISyntaxException In case JDBC is not correct.
      */
     protected DBManager(String user, String password, String JDBC) throws URISyntaxException {
+        if(!JDBC.startsWith("jdbc:"))
+            throw new URISyntaxException(JDBC, "JDBC must start with 'jdbc:'");
+
         this.user = user;
         this.password = password;
         this.JDBC = JDBC;
@@ -188,6 +191,7 @@ public abstract class DBManager {
      * Closes an open connection.
      *
      * @throws SQLException If access error is raised.
+     * @throws NullPointerException In case the object to close is never started.
      */
     protected void doClose() throws SQLException {
         connection.close();
@@ -243,7 +247,7 @@ public abstract class DBManager {
         if (file.exists() && file.isFile()) {
             executeFile(file, commit);
         } else {
-            executeQuery(commit, sql);
+            executeQuery(commit, sql.split(";"));
         }
     }
 

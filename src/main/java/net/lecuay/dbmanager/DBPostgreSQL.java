@@ -32,7 +32,7 @@ public class DBPostgreSQL extends DBManager {
      * @param sslmode  Declares if SSL is required.
      */
     public DBPostgreSQL(String user, String password, String host, String DBName, int port, boolean sslmode) {
-        super(user, password, host, DBName, DBType.MYSQL, port, sslmode);
+        super(user, password, host, DBName, DBType.POSTGRESQL, port, sslmode);
     }
 
     /**
@@ -45,6 +45,7 @@ public class DBPostgreSQL extends DBManager {
      */
     public DBPostgreSQL(String user, String password, String JDBC) throws URISyntaxException {
         super(user, password, JDBC);
+        this.conexType = DBType.POSTGRESQL;
     }
 
     /**
@@ -54,6 +55,7 @@ public class DBPostgreSQL extends DBManager {
      */
     public DBPostgreSQL(URI uri) {
         super(uri);
+        this.conexType = DBType.POSTGRESQL;
     }
 
     /**
@@ -77,7 +79,7 @@ public class DBPostgreSQL extends DBManager {
      * @param password The password used for the connection.
      */
     public DBPostgreSQL(String user, String password) {
-        super(user, password, "localhost", "", DBType.MYSQL, 5432, false);
+        super(user, password, "localhost", "", DBType.POSTGRESQL, 5432, false);
     }
 
     @Override

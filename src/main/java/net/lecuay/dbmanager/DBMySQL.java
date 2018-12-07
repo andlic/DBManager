@@ -43,6 +43,7 @@ public class DBMySQL extends DBManager {
      */
     public DBMySQL(String user, String password, String JDBC) throws URISyntaxException {
         super(user, password, JDBC);
+        this.conexType = DBType.MYSQL;
     }
 
     /**
@@ -52,6 +53,7 @@ public class DBMySQL extends DBManager {
      */
     public DBMySQL(URI uri) {
         super(uri);
+        this.conexType = DBType.MYSQL;
     }
 
     /**
@@ -78,6 +80,9 @@ public class DBMySQL extends DBManager {
         super(user, password, "localhost", "", DBType.MYSQL, 3306, false);
     }
 
+    /**
+     * @throws java.sql.SQLRecoverableException In case connection fails (it will probably be thrown as 'CommunicationsException').
+     */
     @Override
     protected void doConnect() throws SQLException {
         try {
